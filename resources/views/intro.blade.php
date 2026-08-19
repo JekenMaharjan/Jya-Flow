@@ -21,7 +21,7 @@
         <div class="flex items-center space-x-3">
             @if (Route::has('login'))
                 @auth
-                    <a href="{{ url('/dashboard') }}" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-all border border-slate-700">
+                    <a href="{{ url('/tasks') }}" class="px-4 py-2 rounded-xl text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-all border border-slate-700">
                         Dashboard
                     </a>
                 @else

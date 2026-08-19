@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function index(Request $request) {
-        //
-
+    public function index(Request $request) 
+    {
         $tasks = Task::latest()->get();
 
         // If the client sends 'Accept: application/json' (e.g. Postman or API)
@@ -21,20 +21,16 @@ class TaskController extends Controller
         }
 
         // Return view of tasks 
-        return view('dashboard', compact('tasks'));
+        return view('tasks', compact('tasks'));
     }
     
-    public function store(Request $request) 
+    public function store(StoreTaskRequest $request) 
     {
         // 1. Validate input
-        $validated = $request->validate([
-            'title' => 'required|string|max:255'
-        ]);
+        $validatedData = $request->validated();
 
         // 2. Save new task to database and store in $task variable
-        $task = Task::create([
-            'title' => $validated['title']
-        ]);
+        $task = Task::create($validatedData);
 
         // 3. Return JSON if API client (Postman/Mobile/Frontend)
         if ($request->wantsJson()) {

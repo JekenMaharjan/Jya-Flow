@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAuthRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,24 +17,20 @@ class AuthController extends Controller
         return view('auth.register');       // GET: Display register form  
     }
 
-    public function register(Request $request)
+    public function register(StoreAuthRequest $request)
     {
         // 1. Validate incoming request
-        $credentials = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'max:255', 'email', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed']
-        ]);
+        $validatedCredentials = $request->validated();
 
         // 2. Create the user
         $user = User::create([
-            'name' => $credentials['name'],
-            'email' => $credentials['email'],
-            'password' => Hash::make($credentials['password']),
+            'name' => $validatedCredentials['name'],
+            'email' => $validatedCredentials['email'],
+            'password' => Hash::make($validatedCredentials['password']),
         ]);
 
         // 3. Log the user in and redirect
-        Auth::login($user);
+        // Auth::login($user); // Removed as it automatically login user
 
         // 4. Return JSON response
         if ($request->wantsJson()) {
@@ -74,7 +71,7 @@ class AuthController extends Controller
             }
 
             // 3. Redirect back to original destination (or fallback to /dashboard)
-            return redirect()->intended(route('dashboard'))->with('status', 'You have been logged in successfully.');
+            return redirect()->intended(route('tasks'))->with('status', 'You have been logged in successfully.');
         }
 
         // 4. On failure: Redirect BACK to form with validation errors and old email input
