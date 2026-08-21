@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
     public function index(Request $request) 
     {
-        $tasks = Task::latest()->get();
+        // 1. Eager load the user relationship to prevent N+1 query issues/problem
+        // $tasks = Task::with('user')->latest()->get();
+        $tasks = $request->user()->tasks()->latest()->get();
 
-        // If the client sends 'Accept: application/json' (e.g. Postman or API)
+        // 2. the client sends 'Accept: application/json' (e.g. Postman or API)
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Retrieved All Tasks',
@@ -20,23 +23,23 @@ class TaskController extends Controller
             ], 200);
         }
 
-        // Return view of tasks 
+        // 3. Return view of tasks 
         return view('tasks', compact('tasks'));
     }
     
-    public function store(StoreTaskRequest $request) 
+    public function store(StoreTaskRequest $request)
     {
         // 1. Validate input
         $validatedData = $request->validated();
 
-        // 2. Save new task to database and store in $task variable
-        $task = Task::create($validatedData);
+        // 2. Automatically set user_id via relationship (instead of Task::create)
+        $task = $request->user()->tasks()->create($validatedData);
 
         // 3. Return JSON if API client (Postman/Mobile/Frontend)
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Task created successfully!',
-                'task' => $task
+                'task' => $task->load('user')   // Includes user info in JSON response
             ], 201); // 201 Created
         }
 
@@ -44,12 +47,14 @@ class TaskController extends Controller
         return back()->with('success', 'Task created successfully!');
     }
 
-    public function update(Task $task) {
+    public function update(Task $task): RedirectResponse
+    {
         $task->update(['is_completed' => !$task->is_completed]);
         return back();
     }
 
-    public function destroy(Task $task) {
+    public function destroy(Task $task): RedirectResponse
+    {
         $task->delete();
         return back();
     }

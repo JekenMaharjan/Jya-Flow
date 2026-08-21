@@ -2,22 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreAuthRequest;
+use App\Http\Requests\LoginAuthRequest;
+use App\Http\Requests\RegisterAuthRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 class AuthController extends Controller
 {
-    // ----------- REGISTER -----------
+    // ======================== SHOW VIEWS ========================
     public function showRegister()
     {
         return view('auth.register');       // GET: Display register form  
     }
 
-    public function register(StoreAuthRequest $request)
+    public function showLogin()
+    {
+        return view('auth.login');          // GET: Display login form
+    }
+
+
+    // ======================== REGISTER ========================
+    public function register(RegisterAuthRequest $request)
     {
         // 1. Validate incoming request
         $validatedCredentials = $request->validated();
@@ -29,33 +36,63 @@ class AuthController extends Controller
             'password' => Hash::make($validatedCredentials['password']),
         ]);
 
-        // 3. Log the user in and redirect
-        // Auth::login($user); // Removed as it automatically login user
+        // 3. Create Sanctum token
+        $token = $user->createToken('task-manager-api')->plainTextToken;
 
-        // 4. Return JSON response
+        // 4. Return JSON response with 201 Created status
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'User have been successfully created!',
-                'user' => $user
+                'message' => 'User has been successfully created!',
+                'data' => [
+                    'token' => $token,
+                    'user' => [
+                        'name' => $user->name,
+                        'email' => $user->email,
+                    ]
+                ]
             ], 201);
         }
 
-        return redirect()->intended('/login');
+        // Redirect to the login route with a success message
+        return redirect()->route('login')->with('status', 'Registration successful! Please log in.');
     }
 
-    // ----------- LOGIN -----------
-    public function showLogin()
-    {
-        return view('auth.login');          // GET: Display login form
-    }
 
-    public function login(Request $request)
+    // ======================== LOGIN ========================
+    // public function login(LoginAuthRequest $request)
+    // {
+    //     // 1. Validate incoming input
+    //     $credentials = $request->validated();
+
+    //     // 2. Attempt authentication
+    //     if (!Auth::attempt($credentials)) {
+    //         return response()->json([
+    //             'message' => 'Invalid credentials.'
+    //         ], 401);
+    //     }
+
+    //     // 3. Issue Sanctum API Token
+    //     /** @var \App\Models\User $user */
+    //     $user = Auth::user();
+    //     $token = $user->createToken('task-manager-api')->plainTextToken;
+
+    //     // 4. Return JSON response
+    //     if ($request->wantsJson()){
+    //         return response()->json([
+    //             'message' => 'Logged in successfully',
+    //             'token'   => $token,
+    //             'user'    => $user,
+    //         ], 200);
+    //     }
+
+    //     // Redirect back to original destination (or fallback to /dashboard)
+    //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
+    // }
+
+    public function login(LoginAuthRequest $request)
     {
         // 1. Validate request
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $credentials = $request->validated();
 
         // 2. Attempt login
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -80,11 +117,15 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    // ----------- LOGOUT -----------
+    // ======================== LOGOUT ========================
     public function logout(Request $request)
     {
-        Auth::logout();
+        if ($request->wantsJson()) {
+            $request->user()?->currentAccessToken()?->delete();
+            return response()->json(['message' => 'Logged out!']);
+        }
 
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

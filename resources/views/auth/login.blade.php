@@ -15,7 +15,7 @@
 
     <x-logout-success />
 
-    <form action="{{ route('login') }}" method="POST" class="space-y-5">
+    <form action="{{ route('api.login') }}" method="POST" class="space-y-5">
         @csrf
 
         <!-- Email Address -->

@@ -11,13 +11,8 @@ Route::get('/', function () {
 
 // Guest Routes (Only accessible when NOT logged in)
 Route::middleware('guest')->group(function () {
-    // Register Routes    
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register']);
-
-    // Login Routes
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // Apply the rate limiter using throttle: 5 times per 1 minute
 });
 
 // Authenticated Routes (Requires user to be logged in)

@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Override;
 
-class StoreTaskRequest extends FormRequest
+class LoginAuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +23,8 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:100'],
-        ];
-    }
-
-    #[Override]
-    public function messages(): array
-    {
-        return [
-            'title.required' => 'Please provide a title for your task.',
-            'title.string' => 'String only please!',
-            'title.max' => 'The title cannot exceed 100 character.',
+            'email' => ['required', 'email'],
+            'password' => ['required']
         ];
     }
 }

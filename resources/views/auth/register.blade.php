@@ -11,7 +11,7 @@
         <p class="text-sm text-slate-400 mt-1">Get started with your task manager</p>
     </div>
 
-    <form action="{{ route('register') }}" method="POST" class="space-y-5">
+    <form action="{{ route('api.register') }}" method="POST" class="space-y-5">
         @csrf
 
         <!-- Full Name -->

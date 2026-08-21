@@ -3,8 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
-    protected $fillable = ['title', 'is_completed'];
+    protected $fillable = ['title', 'user_id', 'is_completed'];
+
+    // Get the user that owns the task
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
