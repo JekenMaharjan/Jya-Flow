@@ -11,15 +11,32 @@ class TaskController extends Controller
 {
     public function index(Request $request) 
     {
-        // 1. Eager load the user relationship to prevent N+1 query issues/problem
-        // $tasks = Task::with('user')->latest()->get();
-        $tasks = $request->user()->tasks()->latest()->get();
+        // 1. Safety Check: Ensure that a user is authenticated
+        if (!$request->user()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Unauthenticated user.'
+                ], 401);
+            }
+            return redirect()->route('login');
+        }
 
-        // 2. the client sends 'Accept: application/json' (e.g. Postman or API)
+        $totalTasksCount = $request->user()->tasks()->count();
+        $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
+
+        // 2. Eager load the user relationship to prevent N+1 query issues/problem
+        $tasks = $request->user()->tasks()->with('user')->latest()->paginate(5);
+
+        // Pagination -> (paginate(), simplePaginate() & cursorPaginate())
+        // $tasks = Task::paginate(5);
+
+        // 3. the client sends 'Accept: application/json' (e.g. Postman or API)
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Retrieved All Tasks',
-                'tasks' => $tasks
+                'total tasks' => $totalTasksCount,
+                'completed tasks' => $completedTasksCount,
+                // 'tasks' => $tasks
             ], 200);
         }
 

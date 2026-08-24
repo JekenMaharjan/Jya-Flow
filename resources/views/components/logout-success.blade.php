@@ -1,4 +1,4 @@
-<!-- Success Flash Message -->
+<!-- Success Flash Message
     @if (session('status'))
         <div class="mb-6 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-medium flex items-center gap-2.5">
             <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -6,4 +6,4 @@
             </svg>
             <span>{{ session('status') }}</span>
         </div>
-    @endif
+    @endif -->

@@ -79,7 +79,7 @@
     </form>
 
     <!-- Task List -->
-    <ul class="space-y-3">
+    <ul class="space-y-3 mb-5">
         @forelse($tasks as $task)
             <li class="group flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200">
                 
@@ -135,6 +135,9 @@
             </li>
         @endforelse
     </ul>
+
+    <!-- {{ $tasks->onEachSide(5)->links() }} -->
+    {{ $tasks->links() }} 
 
 </div>
 @endsection
