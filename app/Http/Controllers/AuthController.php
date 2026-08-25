@@ -25,20 +25,17 @@ class AuthController extends Controller
     // ======================== REGISTER ========================
     public function register(RegisterAuthRequest $request)
     {
-        // 1. Validate incoming request
+        // Validate incoming request
         $validatedCredentials = $request->validated();
 
-        // 2. Create the user
+        // Create the user
         $user = User::create([
             'name' => $validatedCredentials['name'],
             'email' => $validatedCredentials['email'],
             'password' => Hash::make($validatedCredentials['password']),
         ]);
 
-        // 3. Log the user in and redirect
-        // Auth::login($user); // Removed as it automatically login user
-
-        // 4. Return JSON response
+        // Return JSON response
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'User have been successfully created!',
@@ -53,19 +50,37 @@ class AuthController extends Controller
     // ======================== LOGIN ========================
     public function login(LoginAuthRequest $request)
     {
-        // 1. Get validated input
+        // Get validated input
         $credentials = $request->validated();
 
-        // 2. Attempt Web Session Login
-        if (Auth::attempt($credentials)) {
-            // 3. Regenerate session ID to prevent Session Fixation attacks
+        // // Attempt Web Session Login
+        // if (Auth::attempt($credentials)) {
+        //     // Regenerate session ID to prevent Session Fixation attacks
+        //     $request->session()->regenerate();
+
+        //     // Redirect to tasks route (Session cookie is sent automatically)
+        //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
+        // }
+
+        // What laravel does under the hood
+        $user = User::where('email', $credentials['email'])->first();
+
+        // Check user exists and verify password hash
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            // Authenticates user and creates session
+            // return true;
+
+            // Log the user in to start the authenticated session
+            Auth::login($user);
+
+            // Prevent Session Fixation attacks
             $request->session()->regenerate();
 
-            // 4. Redirect to tasks route (Session cookie is sent automatically)
-            return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
+            // Redirect to intended destination
+            return redirect()->intended(route('tasks'))->with('status', 'You have been logged in successfully.');
         }
 
-        // 5. Return back if credentials fail
+        // Return back if credentials fail
         return back()->withErrors([
             'email' => 'Invalid login credentials.',
         ])->onlyInput('email');

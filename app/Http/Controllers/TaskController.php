@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    // GET: Retrieve all tasks
     public function index(Request $request) 
     {
         // 1. Safety Check: Ensure that a user is authenticated
@@ -41,9 +42,10 @@ class TaskController extends Controller
         }
 
         // 3. Return view of tasks 
-        return view('tasks', compact('tasks'));
+        return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
     }
     
+    // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
         // 1. Validate input
@@ -64,13 +66,21 @@ class TaskController extends Controller
         return back()->with('success', 'Task created successfully!');
     }
 
-    public function update(Task $task): RedirectResponse
+    // GET: Filter Tasks
+    public function filter(Request $request)
+    {
+        
+    }
+
+    // PATCH: Update Task
+    public function update(Task $task)
     {
         $task->update(['is_completed' => !$task->is_completed]);
         return back();
     }
 
-    public function destroy(Task $task): RedirectResponse
+    // DELETE: Delete Task
+    public function destroy(Task $task)
     {
         $task->delete();
         return back();
