@@ -9,43 +9,47 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    // GET: Retrieve all tasks
-    public function index(Request $request) 
-    {
-        // 1. Safety Check: Ensure that a user is authenticated
-        if (!$request->user()) {
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Unauthenticated user.'
-                ], 401);
-            }
-            return redirect()->route('login');
-        }
+    // // GET: Retrieve all tasks
+    // public function index(Request $request) 
+    // {
+    //     // 1. Safety Check: Ensure that a user is authenticated
+    //     if (!$request->user()) {
+    //         if ($request->wantsJson()) {
+    //             return response()->json([
+    //                 'message' => 'Unauthenticated user.'
+    //             ], 401);
+    //         }
+    //         return redirect()->route('login');
+    //     }
 
-        $totalTasksCount = $request->user()->tasks()->count();
-        $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
+    //     // Total tasks and Completed tasks count
+    //     $totalTasksCount = $request->user()->tasks()->count();
+    //     $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
 
-        // 2. Eager load the user relationship to prevent N+1 query issues/problem
-        $tasks = $request->user()->tasks()->with('user')->latest()->paginate(5);
+    //     // 2. Eager load the user relationship to prevent N+1 query issues/problem
+    //     $tasks = $request->user()->tasks()->with('user')->latest()->paginate(5);
 
-        // Pagination -> (paginate(), simplePaginate() & cursorPaginate())
-        // $tasks = Task::paginate(5);
+    //     // Pagination -> (paginate(), simplePaginate() & cursorPaginate())
+    //     // $tasks = Task::paginate(5);
 
-        // 3. the client sends 'Accept: application/json' (e.g. Postman or API)
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Retrieved All Tasks',
-                'total tasks' => $totalTasksCount,
-                'completed tasks' => $completedTasksCount,
-                // 'tasks' => $tasks
-            ], 200);
-        }
+    //     // 3. the client sends 'Accept: application/json' (e.g. Postman or API)
+    //     if ($request->wantsJson()) {
+    //         return response()->json([
+    //             'message' => 'Retrieved All Tasks',
+    //             'total tasks' => $totalTasksCount,
+    //             'completed tasks' => $completedTasksCount,
+    //             // 'tasks' => $tasks
+    //         ], 200);
+    //     }
 
-        // 3. Return view of tasks 
-        return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
-    }
+    //     // 3. Return view of tasks 
+    //     return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
+    // }
     
+    
+    // ===============================================================
     // POST: Create Task
+    // ===============================================================
     public function store(StoreTaskRequest $request)
     {
         // 1. Validate input
@@ -66,20 +70,67 @@ class TaskController extends Controller
         return back()->with('success', 'Task created successfully!');
     }
 
-    // GET: Filter Tasks
-    public function filter(Request $request)
+
+    // ===============================================================
+    // GET: Retrieve all Tasks with Filter Tasks
+    // ===============================================================
+    public function index(Request $request)
     {
+        // Safety Check: Ensure user is logged in
+        if (!$request->user()) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Unauthenticated user.'
+                ], 401);
+            }
+            return redirect()->route('login');
+        }
         
+        // Start query scoped to the logged-in user
+        $query = $request->user()->tasks()->with('user');
+
+        // Conditionally filter by 'is_completed' if 'status' query parameter exists
+        if ($request->filled('status')) {
+            // Converts '1' -> true, '0' -> false
+            $isCompleted = filter_var($request->status, FILTER_VALIDATE_BOOLEAN);
+            $query->where('is_completed', $isCompleted);
+        }
+
+        // Get total & completed counts for counts display
+        $totalTasksCount = $request->user()->tasks()->count();
+        $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
+
+        // Fetch paginated tasks and append query parameters so pagination links preserve filter state
+        $tasks = $query->latest()->paginate(5)->withQueryString();
+
+        // JSON Response for API clients
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Filtered Tasks',
+                'total tasks' => $totalTasksCount,
+                'completed tasks' => $completedTasksCount,
+                'tasks' => $tasks
+            ], 200);
+        }
+
+        // Return Filtered Tasks
+        return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
     }
 
+
+    // ===============================================================
     // PATCH: Update Task
+    // ===============================================================
     public function update(Task $task)
     {
         $task->update(['is_completed' => !$task->is_completed]);
         return back();
     }
 
+
+    // ===============================================================
     // DELETE: Delete Task
+    // ===============================================================
     public function destroy(Task $task)
     {
         $task->delete();

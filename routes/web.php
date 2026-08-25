@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
     // Tasks Filter Routes
-    Route::get('/tasks/{task}', [TaskController::class, 'filter'])->name('tasks.filter');
+    // Route::get('/tasks', [TaskController::class, 'filter'])->name('tasks.filter');
 
     // Logout Route
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ======================== SHOW VIEWS ========================
+    // ===============================================================
+    // GET: Show Register and Login Views
+    // ===============================================================
     public function showRegister()
     {
         return view('auth.register');       // GET: Display register form  
@@ -22,7 +24,10 @@ class AuthController extends Controller
         return view('auth.login');          // GET: Display login form
     }
 
-    // ======================== REGISTER ========================
+    
+    // ===============================================================
+    // POST: Register User
+    // ===============================================================
     public function register(RegisterAuthRequest $request)
     {
         // Validate incoming request
@@ -47,7 +52,9 @@ class AuthController extends Controller
     }
 
 
-    // ======================== LOGIN ========================
+    // ===============================================================
+    // POST: Login User
+    // ===============================================================
     public function login(LoginAuthRequest $request)
     {
         // Get validated input
@@ -85,6 +92,7 @@ class AuthController extends Controller
             'email' => 'Invalid login credentials.',
         ])->onlyInput('email');
     }
+
 
     // // ======================== REGISTER ========================
     // public function register(RegisterAuthRequest $request)
@@ -152,7 +160,10 @@ class AuthController extends Controller
     //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
     // }
 
-    // ======================== LOGOUT ========================
+
+    // ===============================================================
+    // POST: Logout User
+    // ===============================================================
     public function logout(Request $request)
     {
         // if ($request->wantsJson()) {

@@ -38,7 +38,7 @@
     @endauth
 
     <!-- Header with Task Stats -->
-    <div class="flex items-center justify-between mb-8 pb-4 border-b border-white/10">
+    <div class="flex items-center justify-between mb-5 pb-4 border-b border-white/10">
         <div>
             <h2 class="text-2xl font-bold text-white tracking-wide">My Tasks</h2>
             <p class="text-xs text-slate-400 mt-0.5">Manage your daily priorities</p>
@@ -50,6 +50,30 @@
                 {{ $completedTasksCount }} / {{ $totalTasksCount }} Done
             </span>
         @endif
+    </div>
+
+    <p class="text-xs text-slate-400 mb-2">Filter by status (Done/Pending)</p>
+
+    <div class="mb-5">
+        <form action="{{ route('tasks') }}" method="GET" class="flex gap-2 mb-4 items-center flex-wrap">
+            {{-- All Tasks Button --}}
+            <button type="submit" name="status" value="" 
+                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === null || request('status') === '' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+                All Tasks
+            </button>
+
+            {{-- Done Button --}}
+            <button type="submit" name="status" value="1" 
+                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '1' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+                Done
+            </button>
+
+            {{-- Pending Button --}}
+            <button type="submit" name="status" value="0" 
+                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '0' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
+                Pending
+            </button>
+        </form>
     </div>
 
     <!-- Form to Add Task -->
