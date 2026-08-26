@@ -115,8 +115,10 @@
                                             <button 
                                                 type="button" 
                                                 class="bg-red-500 py-1 px-3 rounded-md cursor-pointer"
-                                                onclick="document.getElementById('edit-modal-{{ $file->file }}').close()"
+                                                
+                                                onclick="this.closest('dialog').close()"
                                             >
+                                            <!-- onclick="this.closest('dialog').close()" -->
                                                 Cancel
                                             </button>
                                         </div>

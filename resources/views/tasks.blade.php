@@ -52,7 +52,7 @@
         @endif
     </div>
 
-    <p class="text-xs text-slate-400 mb-2">Filter by status (Done/Pending)</p>
+    <p class="text-xs text-slate-400 mb-2">Filter by status (Completed/InProgress)</p>
 
     <div class="mb-5">
         <form action="{{ route('tasks') }}" method="GET" class="flex gap-2 mb-4 items-center flex-wrap">
@@ -65,13 +65,13 @@
             {{-- Done Button --}}
             <button type="submit" name="status" value="1" 
                 class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '1' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                Done
+                Completed
             </button>
 
             {{-- Pending Button --}}
             <button type="submit" name="status" value="0" 
                 class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '0' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                Pending
+                InProgress
             </button>
         </form>
     </div>
@@ -121,15 +121,19 @@
                         @method('PATCH')
                         <button 
                             type="submit" 
-                            class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ $task->is_completed ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' }}"
+                            class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ !($task->is_completed) ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' }}"
                         >
                             @if($task->is_completed)
-                                <span>Undo</span>
-                            @else
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                 </svg>
-                                <span>Done</span>
+                                <span>Completed</span>
+                            @else
+                                <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                                <span>InProgress</span>
                             @endif
                         </button>
                     </form>
@@ -140,8 +144,11 @@
                         @method('DELETE')
                         <button 
                             type="submit" 
-                            class="text-xs px-3 py-1.5 rounded-lg font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
+                            class="text-xs px-3 py-1.5 rounded-lg flex gap-2 items-center font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
                         >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
                             Delete
                         </button>
                     </form>
