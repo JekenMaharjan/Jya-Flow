@@ -7,7 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Task extends Model
 {
-    protected $fillable = ['title', 'user_id', 'is_completed'];
+    protected $fillable = [
+        'user_id',
+        'title',
+        'description',
+        'file_path',
+        'due_at',
+        'priority',
+        'status',
+        'is_completed',
+    ];
 
     // Get the user that owns the task
     public function user(): BelongsTo

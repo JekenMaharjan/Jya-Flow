@@ -25,6 +25,7 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:255'],
         ];
     }
 

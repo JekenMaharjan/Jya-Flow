@@ -11,88 +11,117 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // ===============================================================
-    // GET: Show Register and Login Views
-    // ===============================================================
+    // GET: Show register page
     public function showRegister()
     {
-        return view('auth.register');       // GET: Display register form  
+        return view('auth.register');  
     }
 
+    // GET: Show login page
     public function showLogin()
     {
-        return view('auth.login');          // GET: Display login form
+        return view('auth.login');
     }
 
-    
-    // ===============================================================
-    // POST: Register User
-    // ===============================================================
+    // POST: User registration
     public function register(RegisterAuthRequest $request)
     {
         // Validate incoming request
-        $validatedCredentials = $request->validated();
+        $credentials = $request->validated();
 
         // Create the user
         $user = User::create([
-            'name' => $validatedCredentials['name'],
-            'email' => $validatedCredentials['email'],
-            'password' => Hash::make($validatedCredentials['password']),
+            'name' => $credentials['name'],
+            'email' => $credentials['email'],
+            'password' => Hash::make($credentials['password']),     // Hasing the password before storing it into database
         ]);
+
+        // Immediately login user after registration
+        Auth::login($user);
+
+        // // TEST: Check response
+        // return response()->json([
+        //     'user_credentials' => $credentials,
+        //     'database_user_credentials' => $user
+        // ]);
 
         // Return JSON response
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'User have been successfully created!',
-                'user' => $user
-            ], 201);
+                'message' => 'User created successfully.',
+                'user_data' => $user
+            ], 201);    // '201' status code for created
         }
 
-        return redirect()->intended('/login');
+        return redirect()
+            ->route('login')
+            ->with('status', 'User created successfully! Please log in.');
     }
 
-
-    // ===============================================================
-    // POST: Login User
-    // ===============================================================
+    // POST: User login
     public function login(LoginAuthRequest $request)
     {
         // Get validated input
         $credentials = $request->validated();
 
-        // // Attempt Web Session Login
-        // if (Auth::attempt($credentials)) {
-        //     // Regenerate session ID to prevent Session Fixation attacks
-        //     $request->session()->regenerate();
-
-        //     // Redirect to tasks route (Session cookie is sent automatically)
-        //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
-        // }
-
-        // What laravel does under the hood
+        // Find user's credentials stored in database which matches entered credentials email and get the first user's data that matches the email
         $user = User::where('email', $credentials['email'])->first();
+        
+        // // TEST: Check response
+        // return response()->json([
+        //     'user_credentials' => $credentials,
+        //     'database_user_credentials' => $user
+        // ]);
 
         // Check user exists and verify password hash
         if ($user && Hash::check($credentials['password'], $user->password)) {
-            // Authenticates user and creates session
-            // return true;
-
             // Log the user in to start the authenticated session
             Auth::login($user);
 
             // Prevent Session Fixation attacks
             $request->session()->regenerate();
 
+            // Return JSON response
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'User logged in successfully.',
+                    'user_data' => $user
+                ], 200);
+            }
+
             // Redirect to intended destination
-            return redirect()->intended(route('tasks'))->with('status', 'You have been logged in successfully.');
+            return redirect()
+                ->intended(route('tasks'))
+                ->with('status', 'User logged in successfully.');
         }
+
+        // // Tip: Easy way to login as all process thats done above is done automatically by Auth::attempt
+        // if (Auth::attempt($credentials)) {
+        //     $request->session()->regenerate();
+
+        //     return redirect()
+        //         ->intended(route('tasks'))
+        //         ->with('status', 'User logged in successfully.');
+        // }
 
         // Return back if credentials fail
         return back()->withErrors([
             'email' => 'Invalid login credentials.',
-        ])->onlyInput('email');
+        ])->onlyInput('email');     // allows form to repopulate the email field
     }
 
+    // POST: Logout User
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()
+            ->route('login')
+            ->with('status', 'User logged out successfully.');
+    }
 
     // // ======================== REGISTER ========================
     // public function register(RegisterAuthRequest $request)
@@ -159,26 +188,4 @@ class AuthController extends Controller
 
     //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
     // }
-
-
-    // ===============================================================
-    // POST: Logout User
-    // ===============================================================
-    public function logout(Request $request)
-    {
-        // if ($request->wantsJson()) {
-        //     $request->user()?->currentAccessToken()?->delete();
-        //     return response()->json(['message' => 'Logged out!']);
-        // }
-
-        // Revoke the token that was used to authenticate the current request
-        // $request->user()->currentAccessToken()->delete();
-
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-
-        return redirect()->route('login')->with('status', 'You have been logged out successfully.');
-    }
 }

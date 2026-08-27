@@ -4,38 +4,6 @@
 
 @section('content')
 <div class="max-w-xl mx-auto my-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
-    
-    <x-login-success />
-    
-    <!-- User Bar with Logout -->
-    @auth
-        <div class="flex items-center justify-between pb-6 mb-6 border-b border-white/10">
-            <div class="flex items-center gap-3">
-                <!-- User Avatar Circle -->
-                <div class="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-sm">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <div>
-                    <h3 class="text-sm font-semibold text-white leading-none">{{ Auth::user()->name }}</h3>
-                    <p class="text-xs text-slate-400 mt-1">{{ Auth::user()->email }}</p>
-                </div>
-            </div>
-
-            <!-- Logout Form -->
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button 
-                    type="submit" 
-                    class="text-xs px-3.5 py-2 rounded-xl font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
-                >
-                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Logout</span>
-                </button>
-            </form>
-        </div>
-    @endauth
 
     <!-- Header with Task Stats -->
     <div class="flex items-center justify-between mb-5 pb-4 border-b border-white/10">
@@ -54,24 +22,24 @@
 
     <p class="text-xs text-slate-400 mb-2">Filter by status (Completed/InProgress)</p>
 
-    <div class="mb-5">
+    <div class="mb-5 font-roboto text-xs">
         <form action="{{ route('tasks') }}" method="GET" class="flex gap-2 mb-4 items-center flex-wrap">
             {{-- All Tasks Button --}}
             <button type="submit" name="status" value="" 
-                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === null || request('status') === '' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                All Tasks
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === null || request('status') === '' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                All Tasks ({{ $totalTasksCount }})
             </button>
 
             {{-- Done Button --}}
             <button type="submit" name="status" value="1" 
-                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '1' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                Completed
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === '1' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                Completed ({{ $completedTasksCount }})
             </button>
 
             {{-- Pending Button --}}
             <button type="submit" name="status" value="0" 
-                class="px-3 py-1.5 rounded-md text-sm cursor-pointer border {{ request('status') === '0' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' }}">
-                InProgress
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === '0' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                InProgress ({{ $totalTasksCount - $completedTasksCount }})
             </button>
         </form>
     </div>
@@ -106,7 +74,7 @@
     <!-- Task List -->
     <ul class="space-y-3 mb-5">
         @forelse($tasks as $task)
-            <li class="group flex items-center justify-between p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200">
+            <li class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200">
                 
                 <!-- Task Title -->
                 <span class="text-sm font-medium transition-all duration-200 {{ $task->is_completed ? 'line-through text-slate-500' : 'text-slate-200' }}">

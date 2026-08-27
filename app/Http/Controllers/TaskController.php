@@ -63,7 +63,7 @@ class TaskController extends Controller
             return response()->json([
                 'message' => 'Task created successfully!',
                 'task' => $task->load('user')   // Includes user info in JSON response
-            ], 201); // 201 Created
+            ], 201);
         }
 
         // 4. Return back for traditional Blade web forms

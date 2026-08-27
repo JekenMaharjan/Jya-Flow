@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Sign Up')
-
 @section('content')
 <div class="max-w-md mx-auto my-6 p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
     
