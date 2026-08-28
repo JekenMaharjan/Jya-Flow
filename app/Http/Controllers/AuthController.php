@@ -36,8 +36,8 @@ class AuthController extends Controller
             'password' => Hash::make($credentials['password']),     // Hasing the password before storing it into database
         ]);
 
-        // Immediately login user after registration
-        Auth::login($user);
+        // // Immediately login user after registration
+        // Auth::login($user);
 
         // // TEST: Check response
         // return response()->json([
