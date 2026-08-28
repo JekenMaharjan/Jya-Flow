@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -76,7 +77,7 @@ class TaskController extends Controller
         
         // Return back
         return back()
-            ->with('status', 'Task created successfully!');
+            ->with('success', 'Task created successfully!');
     }
 
     // GET: Retrieve all Tasks with Filter Tasks
@@ -95,19 +96,21 @@ class TaskController extends Controller
         // Start query scoped to the logged-in user
         $query = $request->user()->tasks()->with('user');
 
-        // Conditionally filter by 'is_completed' if 'status' query parameter exists
-        // if ($request->filled('status')) {
-        //     $isCompleted = filter_var($request->status, FILTER_VALIDATE_BOOLEAN);
-        //     $query->where('is_completed', $isCompleted);
-        // }
+        // For tasks counts
+        $forTasksCount = $request->user()->tasks()->get();
 
-        // Get total & completed counts for counts display
-        $totalTasksCount = $request->user()->tasks()->count();
-        $inProgressTasksCount = $request->user()->tasks()->where('status', 'in_progress')->count();
-        $completedTasksCount = $request->user()->tasks()->where('status', 'completed')->count(); 
+        // Get total, in_progress & completed counts for counts display
+        $totalTasksCount = $forTasksCount->count();
+        $inProgressTasksCount = $forTasksCount->where('status', 'in_progress')->count();
+        $completedTasksCount = $forTasksCount->where('status', 'completed')->count(); 
+
+        // 2. Conditionally apply the status filter if provided (and not 'all')
+        $query->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
+            $q->where('status', $request->status);
+        });
 
         // Fetch paginated tasks and append query parameters so pagination links preserve filter state
-        $tasks = $query->latest()->paginate(5)->withQueryString();
+        $tasks = $query->latest()->paginate(5);
 
         // JSON Response for API clients
         if ($request->wantsJson()) {
@@ -121,16 +124,23 @@ class TaskController extends Controller
         }
 
         // Return Filtered Tasks
-        return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
+        return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount'));
     }
 
     // PATCH: Update Task
     public function update(Task $task)
     {
+        // Toggle strictly between the two enum values
+        $newStatus = ($task->status === TaskStatus::COMPLETED)
+            ? TaskStatus::IN_PROGRESS 
+            : TaskStatus::COMPLETED;
+
+        // Eloquent only updates the 'status' column in the database
         $task->update([
-            'status' => $task->status === 'completed'? 'in_progress' : 'completed'
+            'status' => $newStatus,
         ]);
-        return back();
+
+        return back()->with('success', "Status updated to {$newStatus->label()}");
     }
 
     // DELETE: Delete Task

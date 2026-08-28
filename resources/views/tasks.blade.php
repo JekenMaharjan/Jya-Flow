@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Tasks')
+@use('\App\Enums\TaskStatus')
 
 @section('content')
 <div class="max-w-xl mx-auto my-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
@@ -24,20 +24,20 @@
     <div class="mb-5 font-roboto text-xs">
         <form action="{{ route('tasks') }}" method="GET" class="flex gap-2 mb-4 items-center flex-wrap">
             {{-- All Tasks Button --}}
-            <button type="submit" name="status" value="" 
-                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === null || request('status') === '' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+            <button type="submit" name="status" value="all" 
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === null || request('status') === '' || request('status') === 'all' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
                 All Tasks ({{ $totalTasksCount }})
             </button>
 
             {{-- Pending Button --}}
-            <button type="submit" name="status" value="0" 
-                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === '0' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
-                InProgress ({{ $totalTasksCount - $completedTasksCount }})
+            <button type="submit" name="status" value="in_progress" 
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                InProgress ({{ $inProgressTasksCount }})
             </button>
             
             {{-- Done Button --}}
-            <button type="submit" name="status" value="1" 
-                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === '1' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+            <button type="submit" name="status" value="completed" 
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === 'completed' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
                 Completed ({{ $completedTasksCount }})
             </button>
         </form>
@@ -52,9 +52,6 @@
         <span class="text-sm">+ Add Task</span>
     </button>
 
-    
-
-
     <!-- Task List -->
     <ul class="space-y-3 mb-5">
         @forelse($tasks as $task)
@@ -68,21 +65,20 @@
 
                     <!-- Task due date and time -->
                     <span class="text-[11px] font-light text-gray-400 font-roboto">
-                        {{ $task->due_at}}
+                        {{ $task->due_at ? $task->due_at->format('M d, Y h:i A') : 'No due date' }}
                     </span>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2">
-                    <!-- Toggle Completion -->
                     <form action="{{ route('tasks.update', $task) }}" method="POST">
                         @csrf
                         @method('PATCH')
                         <button 
                             type="submit" 
-                            class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ $task->status !== 'completed' ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20' }}"
+                            class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700') }}"
                         >
-                            @if($task->status === 'completed')
+                            @if($task->status === TaskStatus::COMPLETED)
                                 <x-entypo-check class="h-4 w-4"/>
                                 <span>Completed</span>
                             @else
@@ -122,7 +118,7 @@
         @endforelse
     </ul>
 
-    {{ $tasks->links() }} 
+    {{ $tasks->appends(request()->query())->links() }}
 </div>
 
 @include('modal.addTask')
