@@ -55,7 +55,7 @@ class AuthController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('status', 'User created successfully! Please log in.');
+            ->with('success', 'User created successfully! Please log in.');
     }
 
     // POST: User login
@@ -92,7 +92,7 @@ class AuthController extends Controller
             // Redirect to intended destination
             return redirect()
                 ->intended(route('tasks'))
-                ->with('status', 'User logged in successfully.');
+                ->with('success', 'User logged in successfully.');
         }
 
         // // Tip: Easy way to login as all process thats done above is done automatically by Auth::attempt

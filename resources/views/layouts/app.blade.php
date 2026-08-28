@@ -99,5 +99,7 @@
     <main class="p-10">
         @yield('content')
     </main>
+    
+    <x-toast />
 </body>
 </html>
