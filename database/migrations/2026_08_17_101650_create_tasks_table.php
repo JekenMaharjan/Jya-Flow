@@ -19,11 +19,11 @@ return new class extends Migration
             
             // Task details
             $table->string('title');
-            $table->string('description');
-            $table->string('file_path');
+            $table->text('description')->nullable();
+            $table->string('file_path')->nullable();
 
             // Scheduling & Status
-            $table->dateTime('due_at');
+            $table->dateTime('due_at')->nullable();
             $table->string('priority')->default(TaskPriority::LOW->value);
             $table->string('status')->default(TaskStatus::IN_PROGRESS->value);
 

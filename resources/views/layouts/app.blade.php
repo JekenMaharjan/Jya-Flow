@@ -50,7 +50,7 @@
             <!-- Dashboard Button -->
             <a 
                 href="{{ route('tasks') }}"
-                class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+                class="py-2 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
             >
                 Dashboard
             </a>
@@ -60,7 +60,7 @@
                 @csrf
                 <button 
                     type="submit" 
-                    class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+                    class="flex items-center gap-2 py-2 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
                 >
                     <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -99,7 +99,7 @@
     <main class="p-10">
         @yield('content')
     </main>
-    
+
     <x-toast />
 </body>
 </html>

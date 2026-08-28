@@ -10,7 +10,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        class="fixed top-5 right-5 z-50 flex items-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow-lg border border-gray-700 dark:text-gray-400 dark:bg-gray-800"
+        class="fixed top-3 right-3 z-50 flex items-center w-full max-w-xs p-4 backdrop-blur-md text-gray-500 bg-white/50 rounded-lg shadow-lg border border-gray-700 dark:text-gray-400 dark:bg-gray-800/50"
         role="alert"
     >
         @if (session('success'))

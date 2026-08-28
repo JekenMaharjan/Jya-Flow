@@ -8,7 +8,7 @@
     <!-- Header with Task Stats -->
     <div class="flex items-center justify-between mb-5 pb-4 border-b border-white/10">
         <div>
-            <h2 class="text-2xl font-bold text-white tracking-wide">My Tasks</h2>
+            <h2 class="text-2xl font-bold font-serif text-white tracking-wide">My Tasks</h2>
             <p class="text-xs text-slate-400 mt-0.5">Manage your daily priorities</p>
         </div>
         
@@ -47,7 +47,7 @@
     <button 
         type="button"
         onclick="document.getElementById('taskModal').showModal()"
-        class="flex items-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-4 py-2 cursor-pointer mb-5"
+        class="py-2 px-4 mb-7 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
     >
         <span class="text-sm">+ Add Task</span>
     </button>

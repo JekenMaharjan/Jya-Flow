@@ -120,7 +120,7 @@ class AuthController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('status', 'User logged out successfully.');
+            ->with('success', 'User logged out successfully.');
     }
 
     // // ======================== REGISTER ========================
