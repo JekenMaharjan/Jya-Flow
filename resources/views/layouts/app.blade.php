@@ -13,9 +13,12 @@
     <!-- Tailwind CSS & JS via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="w-full h-full font-['Inter',sans-serif] bg-slate-950 text-slate-100">
+
     <!-- Header -->
     <header class="flex p-5 items-center justify-around bg-slate-900">
+
         <!-- Logo & Title -->
         <a 
             href="{{ route('intro') }}"
@@ -29,65 +32,64 @@
         </a>
 
         @auth
-            <!-- Auth Nagivation Links -->
-            <div class="flex gap-5">
-                <div class="flex items-center gap-3">
-                    <!-- User Avatar Circle -->
-                    <div class="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-sm">
-                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                    </div>
-
-                    <!-- Username & Email -->
-                    <div>
-                        <h3 class="text-sm font-semibold text-white leading-none">{{ Auth::user()->name }}</h3>
-                        <!-- <p class="text-xs text-slate-400 mt-1">{{ Auth::user()->email }}</p> -->
-                    </div>
-
+        <!-- Auth Nagivation Links -->
+        <div class="flex gap-5">
+            <div class="flex items-center gap-3">
+                <!-- User Avatar Circle -->
+                <div class="w-9 h-9 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold text-sm">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
 
-                <!-- Dashboard Button -->
-                <a 
-                    href="{{ route('tasks') }}"
-                    class="bg-indigo-600 inline-block rounded-xl px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
-                >
-                    Dashboard
-                </a>
-
-                <!-- Logout Button / Form -->
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button 
-                        type="submit" 
-                        class="text-xs px-3.5 py-2 rounded-xl font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
-                    >
-                        <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                        <span>Logout</span>
-                    </button>
-                </form>
+                <!-- Username & Email -->
+                <div>
+                    <h3 class="text-sm font-semibold text-white leading-none">{{ Auth::user()->name }}</h3>
+                    <!-- <p class="text-xs text-slate-400 mt-1">{{ Auth::user()->email }}</p> -->
+                </div>
             </div>
+
+            <!-- Dashboard Button -->
+            <a 
+                href="{{ route('tasks') }}"
+                class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+            >
+                Dashboard
+            </a>
+
+            <!-- Logout Button / Form -->
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button 
+                    type="submit" 
+                    class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+                >
+                    <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                </button>
+            </form>
+        </div>
         @endauth
 
         @guest
-            <!-- Guest Nagivation Links -->
-            <div class="flex gap-5">
-                <!-- Login Button -->
-                <a 
-                    href="{{ route('login') }}"
-                    class="bg-indigo-600 inline-block rounded-xl px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
-                >
-                    Log in
-                </a>
+        <!-- Guest Nagivation Links -->
+        <div class="flex gap-5">
+            <!-- Login Button -->
+            <a 
+                href="{{ route('login') }}"
+                class="w-full py-2 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+            >
+                Log in
+            </a>
 
-                <!-- Register Button -->
-                <a
-                    href="{{ route('register') }}"
-                    class="bg-indigo-600 inline-block rounded-xl px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
-                >
-                    Register
-                </a>
-            </div>
+            <!-- Register Button -->
+            <a
+                href="{{ route('register') }}"
+                class="w-full py-2 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+            >
+                Register
+            </a>
+        </div>
         @endguest
     </header>
 

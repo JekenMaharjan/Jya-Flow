@@ -1,7 +1,5 @@
 @extends('layouts.app')
 
-@section('title', 'Login')
-
 @section('content')
 <div class="max-w-md mx-auto my-6 p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
     
@@ -10,10 +8,6 @@
         <h2 class="text-2xl font-bold text-white tracking-wide">Welcome Back</h2>
         <p class="text-sm text-slate-400 mt-1">Sign in to manage your tasks</p>
     </div>
-
-    <x-form-errors />
-
-    <x-logout-success />
 
     <form action="{{ route('login') }}" method="POST" class="space-y-5">
         @csrf

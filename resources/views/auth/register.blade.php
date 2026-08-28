@@ -5,7 +5,7 @@
     
     <!-- Header -->
     <div class="mb-8 text-center">
-        <h2 class="text-2xl font-bold text-white tracking-wide">Create an Account</h2>
+        <h2 class="text-2xl font-bold text-white tracking-wider">Create an Account</h2>
         <p class="text-sm text-slate-400 mt-1">Get started with your task manager</p>
     </div>
 
@@ -86,7 +86,7 @@
         <!-- Submit Button -->
         <button 
             type="submit" 
-            class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 active:scale-[0.98] border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
+            class="w-full py-3.5 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
         >
             Register
         </button>
