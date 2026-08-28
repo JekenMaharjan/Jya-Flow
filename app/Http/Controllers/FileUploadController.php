@@ -7,23 +7,25 @@ use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+use function Pest\Laravel\json;
+
 class FileUploadController extends Controller
 {
-    // ===============================================================
     // GET: Show fileUploads view
-    // ===============================================================
     public function uploadUI()
     {
         // Fetch File Eloquent Models from DB (Not raw strings)
         $files = File::all();
 
+        // // TEST: Check Response
+        // return response()->json([
+        //     'file_date' => $files,
+        // ]);
+
         return view('practice.fileUploads', compact('files'));
     }
 
-    
-    // ===============================================================
     // POST: Upload file
-    // ===============================================================
     public function store(UploadRequest $request)
     {
         // Retrieve validated data (automatically runs rules defined in UploadRequest)
@@ -49,10 +51,7 @@ class FileUploadController extends Controller
         return redirect()->back()->with('error', 'File upload failed.');
     }
 
-
-    // ===============================================================
     // PUT: Update file
-    // ===============================================================
     public function edit(Request $request, File $file)
     {
         // Validate request using the incoming $request object
@@ -84,10 +83,7 @@ class FileUploadController extends Controller
         return redirect()->back()->with('success', 'File updated successfully!');
     }
 
-
-    // ===============================================================
     // DELETE: Delete file
-    // ===============================================================
     public function destroy(File $file)
     {
         // 1. Delete physical file from disk (make sure property matches your DB column)

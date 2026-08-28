@@ -61,7 +61,7 @@ class AuthController extends Controller
     // POST: User login
     public function login(LoginAuthRequest $request)
     {
-        // Get validated input
+        // Validated entered credentials
         $credentials = $request->validated();
 
         // Find user's credentials stored in database which matches entered credentials email and get the first user's data that matches the email

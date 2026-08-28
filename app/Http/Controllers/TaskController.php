@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -46,34 +45,41 @@ class TaskController extends Controller
     //     return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
     // }
     
-    
-    // ===============================================================
     // POST: Create Task
-    // ===============================================================
     public function store(StoreTaskRequest $request)
     {
-        // 1. Validate input
-        $validatedData = $request->validated();
+        // Validate input
+        $data = $request->validated();
 
-        // 2. Automatically set user_id via relationship (instead of Task::create)
-        $task = $request->user()->tasks()->create($validatedData);
+        // Checks request if there's any files or not   
+        if ($request->hasFile('file_path')) {
+            $file_path = $request->file('file_path')->store('uploads', 'public');
+            $data['file_path'] = $file_path;
+        }
 
-        // 3. Return JSON if API client (Postman/Mobile/Frontend)
+        // // TEST: Check response
+        // return response()->json([
+        //     'data' => $data,
+        //     'file_path' => $file_path,
+        // ]);
+
+        // Automatically set user_id via relationship (instead of Task::create)
+        $task = $request->user()->tasks()->create($data);
+        
+        // Return JSON respone
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Task created successfully!',
                 'task' => $task->load('user')   // Includes user info in JSON response
             ], 201);
         }
-
-        // 4. Return back for traditional Blade web forms
-        return back()->with('success', 'Task created successfully!');
+        
+        // Return back
+        return back()
+            ->with('status', 'Task created successfully!');
     }
 
-
-    // ===============================================================
     // GET: Retrieve all Tasks with Filter Tasks
-    // ===============================================================
     public function index(Request $request)
     {
         // Safety Check: Ensure user is logged in
@@ -90,15 +96,15 @@ class TaskController extends Controller
         $query = $request->user()->tasks()->with('user');
 
         // Conditionally filter by 'is_completed' if 'status' query parameter exists
-        if ($request->filled('status')) {
-            // Converts '1' -> true, '0' -> false
-            $isCompleted = filter_var($request->status, FILTER_VALIDATE_BOOLEAN);
-            $query->where('is_completed', $isCompleted);
-        }
+        // if ($request->filled('status')) {
+        //     $isCompleted = filter_var($request->status, FILTER_VALIDATE_BOOLEAN);
+        //     $query->where('is_completed', $isCompleted);
+        // }
 
         // Get total & completed counts for counts display
         $totalTasksCount = $request->user()->tasks()->count();
-        $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
+        $inProgressTasksCount = $request->user()->tasks()->where('status', 'in_progress')->count();
+        $completedTasksCount = $request->user()->tasks()->where('status', 'completed')->count(); 
 
         // Fetch paginated tasks and append query parameters so pagination links preserve filter state
         $tasks = $query->latest()->paginate(5)->withQueryString();
@@ -108,6 +114,7 @@ class TaskController extends Controller
             return response()->json([
                 'message' => 'Filtered Tasks',
                 'total tasks' => $totalTasksCount,
+                'in_progress tasks' => $inProgressTasksCount,
                 'completed tasks' => $completedTasksCount,
                 'tasks' => $tasks
             ], 200);
@@ -117,20 +124,16 @@ class TaskController extends Controller
         return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
     }
 
-
-    // ===============================================================
     // PATCH: Update Task
-    // ===============================================================
     public function update(Task $task)
     {
-        $task->update(['is_completed' => !$task->is_completed]);
+        $task->update([
+            'status' => $task->status === 'completed'? 'in_progress' : 'completed'
+        ]);
         return back();
     }
 
-
-    // ===============================================================
     // DELETE: Delete Task
-    // ===============================================================
     public function destroy(Task $task)
     {
         $task->delete();
