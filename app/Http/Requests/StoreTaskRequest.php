@@ -28,11 +28,11 @@ class StoreTaskRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:100'],
-            'description' => ['string', 'max:500'],
-            'file_path' => ['file', 'mimes:pdf,doc,docx,jpg,png', 'max:20480'],
-            'due_at' => ['date', 'after:today'],
-            'priority'=> [Rule::enum(TaskPriority::class)],
-            'status' => [Rule::enum(TaskStatus::class)],
+            'description' => ['nullable', 'string', 'max:500'],
+            'file_path' => ['nullable', 'file', 'mimes:pdf,doc,docx,jpg,png', 'max:20480'],     // 20 MB max
+            'due_at' => ['nullable', 'date', 'after_or_equal:today'],       // Allows today's date
+            'priority'=> ['required', Rule::enum(TaskPriority::class)],
+            'status' => ['required', Rule::enum(TaskStatus::class)],
         ];
     }
 

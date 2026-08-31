@@ -100,6 +100,6 @@
         @yield('content')
     </main>
 
-    <x-toast />
+    <!-- <x-toast /> -->
 </body>
 </html>
