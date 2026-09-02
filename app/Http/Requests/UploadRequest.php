@@ -23,7 +23,7 @@ class UploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'document' => ['required', 'file', 'mimes:pdf,jpg,png,docx', 'max:5120']
+            'files.*' => ['required', 'file', 'mimes:pdf,jpg,png,docx', 'max:20480']
         ];
     }
 }

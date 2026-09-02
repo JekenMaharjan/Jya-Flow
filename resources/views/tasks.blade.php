@@ -52,7 +52,7 @@
             {{-- Default --}}
             <a href="{{ request()->fullUrlWithQuery(['priority' => 'all']) }}"
                 class="px-3 py-1 rounded-md cursor-pointer border {{ request('priority') === null || request('priority') === '' || request('priority') === 'all' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
-                Default ({{ $totalTasksCount }})
+                All Tasks ({{ $totalTasksCount }})
             </a>
 
             {{-- Pending Button --}}

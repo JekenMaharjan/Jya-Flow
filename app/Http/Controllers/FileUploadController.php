@@ -11,44 +11,36 @@ use function Pest\Laravel\json;
 
 class FileUploadController extends Controller
 {
-    // GET: Show fileUploads view
+    // GET: Retrieve all files
     public function uploadUI()
     {
-        // Fetch File Eloquent Models from DB (Not raw strings)
-        $files = File::all();
-
-        // // TEST: Check Response
-        // return response()->json([
-        //     'file_date' => $files,
-        // ]);
-
+        // Get all files from the database - newest first
+        $files = File::latest()->get();
+        
+        // Pass them to the view
         return view('practice.fileUploads', compact('files'));
     }
 
     // POST: Upload file
     public function store(UploadRequest $request)
     {
-        // Retrieve validated data (automatically runs rules defined in UploadRequest)
+        // Validate incoming request
         $request->validated();
 
-        if ($request->hasFile('document')) {
-            // Get the uploaded file instance
-            $file = $request->file('document');
-
-            // Store the file safely using storeAs
-            $filePath = $file->storeAs('uploads', $file->getClientOriginalName(), 'public');
-
-            // Save file metadata in the database
-            $fileRecord = File::create([
-                'name' => basename($filePath),
-                'file_path' => $filePath
-            ]);
+        // Check if files were uploaded
+        if ($request->hasFile('files')) {
+            // Foreach loop through each file
+            foreach ($request->file('files') as $file) {
+                // Store each file in the 'public/uploads' directory
+                $path = $file->store('uploads', 'public');
+                File::create(['filename' => $path]);
+            }
 
             // Return HTTP response with success flash message
-            return redirect()->back()->with('success', 'File uploaded successfully!');
+            return back()->with('success', 'Files uploaded successfully!');
         }
 
-        return redirect()->back()->with('error', 'File upload failed.');
+        return back()->with('error', 'Files upload failed.');
     }
 
     // PUT: Update file
