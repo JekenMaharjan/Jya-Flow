@@ -7,7 +7,7 @@
     <div class="max-w-xl mx-auto my-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
 
         <!-- Header with Task Stats -->
-        <div class="flex items-center justify-between mb-5 pb-4 border-b border-white/10">
+        <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
             <div>
                 <h2 class="text-2xl font-bold font-serif text-white tracking-wide">My Tasks</h2>
                 <p class="text-xs text-slate-400 mt-0.5">Manage your daily priorities</p>
@@ -20,29 +20,61 @@
             @endif
         </div>
 
+        <!-- Filter by Status -->
         <p class="text-xs text-slate-400 mb-2">Filter by status (Completed / InProgress)</p>
 
-        <div class="mb-5 font-roboto text-xs">
-            <form action="{{ route('tasks') }}" method="GET" class="flex gap-2 mb-4 items-center flex-wrap">
-                {{-- All Tasks Button --}}
-                <button type="submit" name="status" value="all" 
-                    class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === null || request('status') === '' || request('status') === 'all' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
-                    All Tasks ({{ $totalTasksCount }})
-                </button>
+        <div class="flex gap-2 font-roboto text-xs">
+            {{-- All Tasks --}}
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border transition {{ request('status', 'all') === 'all' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                All Tasks ({{ $totalTasksCount }})
+            </a>
 
-                {{-- Pending Button --}}
-                <button type="submit" name="status" value="in_progress" 
-                    class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
-                    InProgress ({{ $inProgressTasksCount }})
-                </button>
-                
-                {{-- Done Button --}}
-                <button type="submit" name="status" value="completed" 
-                    class="px-3 py-1 rounded-md cursor-pointer border {{ request('status') === 'completed' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
-                    Completed ({{ $completedTasksCount }})
-                </button>
-            </form>
+            {{-- In Progress --}}
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'in_progress']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border transition {{ request('status') === 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                InProgress ({{ $inProgressTasksCount }})
+            </a>
+            
+            {{-- Completed --}}
+            <a href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border transition {{ request('status') === 'completed' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                Completed ({{ $completedTasksCount }})
+            </a>
         </div>
+
+        <hr class="text-white/10 my-4">
+
+        <!-- Filter by Priority -->
+        <p class="text-xs text-slate-400 mb-2">Filter by priority (Low / Medium / High)</p>
+
+        <div class="flex gap-2 font-roboto text-xs">
+            {{-- Default --}}
+            <a href="{{ request()->fullUrlWithQuery(['priority' => 'all']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('priority') === null || request('priority') === '' || request('priority') === 'all' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                Default ({{ $totalTasksCount }})
+            </a>
+
+            {{-- Pending Button --}}
+            <a href="{{ request()->fullUrlWithQuery(['priority' => 'low']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('priority') === 'low' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                Low ({{ $lowTasksCount }})
+            </a>
+            
+            {{-- Done Button --}}
+            <a href="{{ request()->fullUrlWithQuery(['priority' => 'medium']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('priority') === 'medium' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                Medium ({{ $mediumTasksCount }})
+            </a>
+            
+            {{-- Done Button --}}
+            <a href="{{ request()->fullUrlWithQuery(['priority' => 'high']) }}"
+                class="px-3 py-1 rounded-md cursor-pointer border {{ request('priority') === 'high' ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-200' }}">
+                High ({{ $highTasksCount }})
+            </a>
+        </div>
+
+        <hr class="text-white/10 my-4">
 
         <!-- Add task button -->
         <button 
@@ -57,11 +89,11 @@
         <ul class="space-y-3 mb-5">
             @forelse($tasks as $task)
                 <li 
-                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->priority) {
-                        TaskPriority::LOW => 'bg-blue-400',
-                        TaskPriority::MEDIUM => 'bg-yellow-400',
-                        TaskPriority::HIGH => 'bg-red-500',
-                        default => 'bg-gray-400',
+                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->priority) {
+                        TaskPriority::LOW => 'bg-blue-300/20 hover:bg-blue-300/30',
+                        TaskPriority::MEDIUM => 'bg-yellow-300/20 hover:bg-yellow-300/30',
+                        TaskPriority::HIGH => 'bg-red-300/20 hover:bg-red-300/30',
+                        default => 'bg-gray-300/20 hover:bg-gray-300/30',
                     } }}"
                     onclick="document.getElementById('previewTaskModal_{{ $task->id }}').showModal()"
                 >
@@ -86,7 +118,7 @@
                                 <span class="text-[11px] uppercase text-slate-300">{{ $task->priority }}</span>
                             </span>
 
-                            <span class="text-slate-600 select-none">|</span>
+                            <span class="text-slate-300 select-none">|</span>
 
                             <span class="flex gap-2 items-center">
                                 <x-codicon-circle-small-filled class="w-3 h-3 scale-150 {{ (($task->status) === TaskStatus::COMPLETED) ? ('text-emerald-400') : ('text-yellow-400') }}"/>
@@ -108,7 +140,7 @@
                             <button 
                                 type="submit"
                                 onclick="event.stopPropagation()"
-                                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700') }}"
+                                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-800 text-slate-300 border-slate-800 hover:bg-slate-800/70') }}"
                             >
                                 @if($task->status === TaskStatus::COMPLETED)
                                     <x-entypo-check class="h-4 w-4"/>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
@@ -59,17 +60,27 @@ class TaskController extends Controller
         // For tasks counts
         $forTasksCount = $user->tasks()->get();
 
-        // Get total, in_progress & completed counts for counts display
+        // Get total, in_progress & completed status counts for counts display
         $totalTasksCount = $forTasksCount->count();
         $inProgressTasksCount = $forTasksCount->where('status', TaskStatus::IN_PROGRESS->value ?? 'in_progress')->count();
         $completedTasksCount = $forTasksCount->where('status', TaskStatus::COMPLETED->value ?? 'completed')->count(); 
 
-         // Start query scoped to the logged-in user
+        // Get low, medium & high priority counts for counts display
+        $lowTasksCount = $forTasksCount->where('priority', TaskPriority::LOW->value ?? 'low')->count();
+        $mediumTasksCount = $forTasksCount->where('priority', TaskPriority::MEDIUM->value ?? 'medium')->count();
+        $highTasksCount = $forTasksCount->where('priority', TaskPriority::HIGH->value ?? 'high')->count();
+
+        // Start query scoped to the logged-in user
         $query = $user->tasks()->with('user');
 
-        // 2. Conditionally apply the status filter if provided (and not 'all')
+        // Conditionally apply the status filter if provided (and not 'all')
         $query->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
             $q->where('status', $request->status);
+        });
+
+        // Similarly for the priority filter if provided
+        $query->when($request->filled('priority') && $request->priority !== 'all', function ($q) use ($request) {
+            $q->where('priority', $request->priority);
         });
 
         // Fetch paginated tasks and append query parameters so pagination links preserve filter state
@@ -82,12 +93,15 @@ class TaskController extends Controller
                 'total tasks' => $totalTasksCount,
                 'in_progress tasks' => $inProgressTasksCount,
                 'completed tasks' => $completedTasksCount,
-                'tasks' => $tasks
+                'low tasks' => $lowTasksCount,
+                'medium tasks' => $mediumTasksCount,
+                'high tasks' => $highTasksCount,
+                'tasks' => $tasks,
             ], 200);
         }
 
         // Return Filtered Tasks
-        return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount'));
+        return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount', 'lowTasksCount', 'mediumTasksCount', 'highTasksCount'));
     }
 
     // GET: Preview Task
