@@ -6,46 +6,10 @@ use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
-    // // GET: Retrieve all tasks
-    // public function index(Request $request) 
-    // {
-    //     // 1. Safety Check: Ensure that a user is authenticated
-    //     if (!$request->user()) {
-    //         if ($request->wantsJson()) {
-    //             return response()->json([
-    //                 'message' => 'Unauthenticated user.'
-    //             ], 401);
-    //         }
-    //         return redirect()->route('login');
-    //     }
-
-    //     // Total tasks and Completed tasks count
-    //     $totalTasksCount = $request->user()->tasks()->count();
-    //     $completedTasksCount = $request->user()->tasks()->where('is_completed', true)->count(); 
-
-    //     // 2. Eager load the user relationship to prevent N+1 query issues/problem
-    //     $tasks = $request->user()->tasks()->with('user')->latest()->paginate(5);
-
-    //     // Pagination -> (paginate(), simplePaginate() & cursorPaginate())
-    //     // $tasks = Task::paginate(5);
-
-    //     // 3. the client sends 'Accept: application/json' (e.g. Postman or API)
-    //     if ($request->wantsJson()) {
-    //         return response()->json([
-    //             'message' => 'Retrieved All Tasks',
-    //             'total tasks' => $totalTasksCount,
-    //             'completed tasks' => $completedTasksCount,
-    //             // 'tasks' => $tasks
-    //         ], 200);
-    //     }
-
-    //     // 3. Return view of tasks 
-    //     return view('tasks', compact('tasks', 'totalTasksCount', 'completedTasksCount'));
-    // }
-    
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
@@ -54,8 +18,7 @@ class TaskController extends Controller
 
         // Checks request if there's any files or not   
         if ($request->hasFile('file_path')) {
-            $file_path = $request->file('file_path')->store('uploads', 'public');
-            $data['file_path'] = $file_path;
+            $data['file_path'] = $request->file('file_path')->store('uploads', 'public');
         }
 
         // // TEST: Check response
@@ -76,15 +39,15 @@ class TaskController extends Controller
         }
         
         // Return back
-        return back()
-            ->with('success', 'Task created successfully!');
+        return back()->with('success', 'Task created successfully!');
     }
 
     // GET: Retrieve all Tasks with Filter Tasks
     public function index(Request $request)
     {
+        $user = $request->user();
         // Safety Check: Ensure user is logged in
-        if (!$request->user()) {
+        if (!$user) {
             if ($request->wantsJson()) {
                 return response()->json([
                     'message' => 'Unauthenticated user.'
@@ -93,16 +56,16 @@ class TaskController extends Controller
             return redirect()->route('login');
         }
         
-        // Start query scoped to the logged-in user
-        $query = $request->user()->tasks()->with('user');
-
         // For tasks counts
-        $forTasksCount = $request->user()->tasks()->get();
+        $forTasksCount = $user->tasks()->get();
 
         // Get total, in_progress & completed counts for counts display
         $totalTasksCount = $forTasksCount->count();
-        $inProgressTasksCount = $forTasksCount->where('status', 'in_progress')->count();
-        $completedTasksCount = $forTasksCount->where('status', 'completed')->count(); 
+        $inProgressTasksCount = $forTasksCount->where('status', TaskStatus::IN_PROGRESS->value ?? 'in_progress')->count();
+        $completedTasksCount = $forTasksCount->where('status', TaskStatus::COMPLETED->value ?? 'completed')->count(); 
+
+         // Start query scoped to the logged-in user
+        $query = $user->tasks()->with('user');
 
         // 2. Conditionally apply the status filter if provided (and not 'all')
         $query->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
@@ -110,7 +73,7 @@ class TaskController extends Controller
         });
 
         // Fetch paginated tasks and append query parameters so pagination links preserve filter state
-        $tasks = $query->latest()->paginate(5);
+        $tasks = $query->latest()->paginate(5)->withQueryString();
 
         // JSON Response for API clients
         if ($request->wantsJson()) {
@@ -127,6 +90,51 @@ class TaskController extends Controller
         return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount'));
     }
 
+    // GET: Preview Task
+    public function preview(Request $request, Task $task)
+    {
+        if ($task->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized Access.'], 403);
+        }
+
+        return response()->json([
+            'id' => $task->id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'file_path' => $task->file_path,
+            'due_at' => $task->due_at,
+            'priority' => $task->priority,
+            'status' => $task->status,
+        ]);
+    }
+
+    // PUT: Change Task details
+    public function change(StoreTaskRequest $request, Task $task)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('file_path')) {
+            // Delete previous file if exists
+            if ($task->file_path) {
+                Storage::disk('public')->delete($task->file_path);
+            }
+
+            // Store new file
+            $data['file_path'] = $request->file('file_path')->store('tasks', 'public');
+        }
+
+        $task->update($data);
+            
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Task updated successfully!',
+                'updated_task' => $task
+            ]);
+        }
+
+        return back()->with('success', 'Task updated successfully!');
+    }
+
     // PATCH: Update Task
     public function update(Task $task)
     {
@@ -136,9 +144,7 @@ class TaskController extends Controller
             : TaskStatus::COMPLETED;
 
         // Eloquent only updates the 'status' column in the database
-        $task->update([
-            'status' => $newStatus,
-        ]);
+        $task->update(['status' => $newStatus]);
 
         return back()->with('success', "Status updated to {$newStatus->label()}");
     }
@@ -147,6 +153,6 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $task->delete();
-        return back();
+        return back()->with('success', 'Task deleted successfully.');
     }
 }

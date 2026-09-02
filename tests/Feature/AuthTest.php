@@ -115,7 +115,7 @@ test('authenticated user can log out', function () {
     // Act: Authenticate user and hit the logout endpoint
     $response = $this->actingAs($user)->post('/logout');
 
-    // Assert: User is redirected to home/login and is now a guest
+    // Assert: User is redirected to login and is now a guest
     $response->assertRedirect('/login');
     $this->assertGuest();
 });

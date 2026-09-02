@@ -12,6 +12,7 @@
         "php": "^8.3",
         "blade-ui-kit/blade-icons": "^1.10",
         "codeat3/blade-carbon-icons": "^2.39",
+        "codeat3/blade-codicons": "^1.35",
         "codeat3/blade-file-icons": "^1.11",
         "codeat3/blade-fluentui-system-icons": "^1.35",
         "codeat3/blade-phosphor-icons": "^2.4",
