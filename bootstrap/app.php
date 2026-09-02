@@ -13,13 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->validateCsrfTokens(except: [
-        'register',
-        'login',
-        'logout',
-        'tasks',
-        'tasks/*',
-        ]);
+        // $middleware->validateCsrfTokens(except: [
+        // 'register',
+        // 'login',
+        // 'logout',
+        // 'tasks',
+        // 'tasks/*',
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

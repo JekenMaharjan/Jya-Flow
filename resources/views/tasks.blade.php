@@ -57,7 +57,12 @@
         <ul class="space-y-3 mb-5">
             @forelse($tasks as $task)
                 <li 
-                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200"
+                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->priority) {
+                        TaskPriority::LOW => 'bg-blue-400',
+                        TaskPriority::MEDIUM => 'bg-yellow-400',
+                        TaskPriority::HIGH => 'bg-red-500',
+                        default => 'bg-gray-400',
+                    } }}"
                     onclick="document.getElementById('previewTaskModal_{{ $task->id }}').showModal()"
                 >
                     <!-- First half -->

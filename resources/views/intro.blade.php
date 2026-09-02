@@ -11,14 +11,25 @@
     </p>
 
     <span class="flex justify-center items-center m-5 gap-5">
-        <p class="text-2xl font-pinyon">Get started in less than 1 minute.</p>
+        <p class="text-md font-lobster">Get started in less than 1 minute.</p>
         <!-- Getting Started Button -->
+        @auth
+        <a
+            href="{{ route('tasks') }}"
+            class="bg-indigo-600 rounded-xl inline-block px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
+        >
+            Dashboard
+        </a>
+        @endauth
+
+        @guest
         <a
             href="{{ route('register') }}"
             class="bg-indigo-600 rounded-xl inline-block px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
         >
             Get Started
         </a>
+        @endguest
     </span>
 
     <p class="text-md font-roboto text-center bg-slate-700/70 p-5 rounded-xl">

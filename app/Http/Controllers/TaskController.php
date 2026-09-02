@@ -111,6 +111,7 @@ class TaskController extends Controller
     // PUT: Change Task details
     public function change(StoreTaskRequest $request, Task $task)
     {
+        // Validate incoming request
         $data = $request->validated();
 
         if ($request->hasFile('file_path')) {
@@ -120,9 +121,10 @@ class TaskController extends Controller
             }
 
             // Store new file
-            $data['file_path'] = $request->file('file_path')->store('tasks', 'public');
+            $data['file_path'] = $request->file('file_path')->store('uploads', 'public');
         }
 
+        // Update task details using 'update' method
         $task->update($data);
             
         if ($request->wantsJson()) {
@@ -132,6 +134,7 @@ class TaskController extends Controller
             ]);
         }
 
+        // Return back to the same page
         return back()->with('success', 'Task updated successfully!');
     }
 
@@ -152,7 +155,16 @@ class TaskController extends Controller
     // DELETE: Delete Task
     public function destroy(Task $task)
     {
+        // Check if the task record in the DB has a file path stored
+        if ($task->file_path) {
+            // Delete the physical file from the disk(public folder)
+            Storage::disk('public')->delete($task->file_path);
+        }
+
+        // Delete the content from the database using 'delete' method
         $task->delete();
+
+        // Return back to the same page
         return back()->with('success', 'Task deleted successfully.');
     }
 }

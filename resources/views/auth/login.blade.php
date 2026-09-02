@@ -26,11 +26,8 @@
                 required
                 class="w-full px-4 py-3 rounded-xl bg-white/5 border @error('email') border-red-500/80 @else border-white/10 @enderror text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/10 transition-all duration-200"
             >
-            <!-- Field-level error (shows only if email fails basic email format validation) -->
             @error('email') 
-                @unless(old('email'))
-                    <p class="mt-1.5 text-xs text-red-400 font-medium">{{ $message }}</p> 
-                @endunless
+                <p class="mt-1.5 text-xs text-red-400 font-medium">{{ $message }}</p> 
             @enderror
         </div>
 
