@@ -34,14 +34,14 @@
 
         <!-- File Upload -->
         <div class="relative flex-1">
-            <label for="file_path" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Upload File</label>
+            <label for="filename" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Upload File</label>
             <input 
                 type="file" 
-                name="file_path"
-                required
+                name="files[]"
                 class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer transition-all duration-200"
+                multiple
             >
-            @error('file_path')
+            @error('filename')
                 <p class="absolute -bottom-5 left-1 text-xs text-red-400 font-medium">{{ $message }}</p>
             @enderror
         </div>

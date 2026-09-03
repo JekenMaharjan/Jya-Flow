@@ -14,28 +14,37 @@ class TaskController extends Controller
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
-        // Validate input
+        // Validate input data - PHP array
         $data = $request->validated();
 
+        // Create empty array to hold all the uploaded files
+        $uploadedFiles = [];
+
         // Checks request if there's any files or not   
-        if ($request->hasFile('file_path')) {
-            $data['file_path'] = $request->file('file_path')->store('uploads', 'public');
+        if ($request->hasFile('files')) {
+            // Foreach loop through each file
+            foreach ($request->file('files') as $file) {
+                $uploadedFiles[] = $file->store('uploads', 'public');
+            }
         }
+
+        // Save array of paths into 'filename'
+        $data['filename'] = $uploadedFiles;
+
+        // Create task
+        $task = $request->user()->tasks()->create($data);
 
         // // TEST: Check response
         // return response()->json([
         //     'data' => $data,
-        //     'file_path' => $file_path,
+        //     'filename' => $files,
         // ]);
 
-        // Automatically set user_id via relationship (instead of Task::create)
-        $task = $request->user()->tasks()->create($data);
-        
         // Return JSON respone
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Task created successfully!',
-                'task' => $task->load('user')   // Includes user info in JSON response
+                'task' => $task->load('user', 'files')   // Includes user info and files in JSON response
             ], 201);
         }
         
@@ -115,7 +124,7 @@ class TaskController extends Controller
             'id' => $task->id,
             'title' => $task->title,
             'description' => $task->description,
-            'file_path' => $task->file_path,
+            'filename' => $task->filename,
             'due_at' => $task->due_at,
             'priority' => $task->priority,
             'status' => $task->status,
@@ -128,14 +137,14 @@ class TaskController extends Controller
         // Validate incoming request
         $data = $request->validated();
 
-        if ($request->hasFile('file_path')) {
+        if ($request->hasFile('filename')) {
             // Delete previous file if exists
-            if ($task->file_path) {
-                Storage::disk('public')->delete($task->file_path);
+            if ($task->filename) {
+                Storage::disk('public')->delete($task->filename);
             }
 
             // Store new file
-            $data['file_path'] = $request->file('file_path')->store('uploads', 'public');
+            $data['filename'] = $request->file('filename')->store('uploads', 'public');
         }
 
         // Update task details using 'update' method
@@ -170,9 +179,9 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         // Check if the task record in the DB has a file path stored
-        if ($task->file_path) {
+        if ($task->filename) {
             // Delete the physical file from the disk(public folder)
-            Storage::disk('public')->delete($task->file_path);
+            Storage::disk('public')->delete($task->filename);
         }
 
         // Delete the content from the database using 'delete' method

@@ -20,7 +20,7 @@ return new class extends Migration
             // Task details
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('file_path')->nullable();
+            $table->string('filename')->nullable();
 
             // Scheduling & Status
             $table->dateTime('due_at')->nullable();

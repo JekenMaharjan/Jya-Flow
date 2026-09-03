@@ -41,27 +41,32 @@
                     <label for="file_path" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Upload File</label>
 
                     <!-- Display current file if it exists -->
-                    @if($task->file_path)
-                        <div class="mb-2 flex items-center justify-between px-4 py-2 bg-slate-800/80 border border-white/10 rounded-xl">
-                            <div class="flex items-center space-x-2 truncate">
-                                <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-                                </svg>
-                                <span class="text-xs text-slate-300 truncate font-mono">
-                                    {{ basename($task->file_path) }}
-                                </span>
-                            </div>
-                            <a href="{{ Storage::url($task->file_path) }}" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline shrink-0 ml-2">
-                                View
-                            </a>
+                    @if($task->filename)
+                        <div class="mb-2 flex flex-col gap-2 justify-between px-4 py-2 bg-slate-800/80 border border-white/10 rounded-xl">
+                            @foreach($task->filename as $file)    
+                                <div class="flex gap-5">
+                                    <div class="flex items-center space-x-2 truncate">
+                                        <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                        </svg>
+                                    
+                                        <span class="text-xs text-slate-300 truncate font-mono">
+                                            {{ basename($file) }}
+                                        </span>
+                                    </div>
+                                    <a href="{{ Storage::url($file) }}" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 underline shrink-0 ml-2">
+                                        View
+                                    </a>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
 
                     <!-- File input for new file upload -->
                     <input 
                         type="file" 
-                        name="file_path"
-                        id="file_path"
+                        name="files[]"
+                        multiple
                         class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer transition-all duration-200"
                     >
                     

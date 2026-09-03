@@ -89,12 +89,16 @@
         <ul class="space-y-3 mb-5">
             @forelse($tasks as $task)
                 <li 
-                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->priority) {
-                        TaskPriority::LOW => 'bg-blue-300/20 hover:bg-blue-300/30',
-                        TaskPriority::MEDIUM => 'bg-yellow-300/20 hover:bg-yellow-300/30',
-                        TaskPriority::HIGH => 'bg-red-300/20 hover:bg-red-300/30',
-                        default => 'bg-gray-300/20 hover:bg-gray-300/30',
-                    } }}"
+                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->status) {
+                            TaskStatus::IN_PROGRESS => match($task->priority) {
+                                TaskPriority::LOW => 'bg-blue-300/20 hover:bg-blue-300/30',
+                                TaskPriority::MEDIUM => 'bg-yellow-300/20 hover:bg-yellow-300/30',
+                                TaskPriority::HIGH => 'bg-red-300/20 hover:bg-red-300/30',
+                                default => 'bg-gray-300/20 hover:bg-gray-300/30',
+                            },
+                            TaskStatus::COMPLETED => 'bg-green-300/20 hover:bg-green-300/30',
+                            default => 'bg-gray-300/20 hover:bg-gray-300/30',
+                        } }}"
                     onclick="document.getElementById('previewTaskModal_{{ $task->id }}').showModal()"
                 >
                     <!-- First half -->
