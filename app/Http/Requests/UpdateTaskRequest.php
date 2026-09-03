@@ -26,13 +26,16 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['string', 'max:100'],
+            'title' => ['sometimes', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
-            'files' => ['array', 'min:1'],
-            'files.*' => ['file', 'mimes:pdf,doc,docx,jpg,png,txt', 'max:20480'],     // 20 MB max
-            'due_at' => ['nullable', 'date', 'after_or_equal:today'],       // Allows today's date
-            'priority'=> [Rule::enum(TaskPriority::class)],
-            'status' => [Rule::enum(TaskStatus::class)],
+
+            'files' => ['nullable', 'array'],
+            'files.*' => ['file', 'mimes:pdf,doc,docx,jpg,png,txt', 'max:20480'],
+            
+            'due_at' => ['nullable', 'date'],
+            
+            'priority'=> ['sometimes', Rule::enum(TaskPriority::class)],
+            'status' => ['sometimes', Rule::enum(TaskStatus::class)],
         ];
     }
 }

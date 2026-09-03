@@ -22,9 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // // Define a custom login rate limiter (e.g., 5 attempts per minute)
-        // RateLimiter::for('login', function (Request $request) {
-        //     return Limit::perMinute(5)->by($request->input('email') . $request->ip());
-        // });
+        //
     }
 }
