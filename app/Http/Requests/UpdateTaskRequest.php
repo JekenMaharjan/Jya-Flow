@@ -7,9 +7,8 @@ use App\Enums\TaskStatus;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Override;
 
-class StoreTaskRequest extends FormRequest
+class UpdateTaskRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,23 +26,13 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:100'],
+            'title' => ['string', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
-            'files' => ['required', 'array', 'min:1'],
+            'files' => ['array', 'min:1'],
             'files.*' => ['file', 'mimes:pdf,doc,docx,jpg,png,txt', 'max:20480'],     // 20 MB max
             'due_at' => ['nullable', 'date', 'after_or_equal:today'],       // Allows today's date
-            'priority'=> ['required', Rule::enum(TaskPriority::class)],
+            'priority'=> [Rule::enum(TaskPriority::class)],
             'status' => [Rule::enum(TaskStatus::class)],
-        ];
-    }
-
-    #[Override]
-    public function messages(): array
-    {
-        return [
-            'title.required' => 'Please provide a title for your task.',
-            'title.string' => 'String only please!',
-            'title.max' => 'The title cannot exceed 100 character.',
         ];
     }
 }

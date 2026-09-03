@@ -38,7 +38,7 @@
 
                 <!-- File Upload -->
                 <div class="flex flex-col w-full gap-3">
-                    <label for="file_path" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Upload File</label>
+                    <label for="filename" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Upload File</label>
 
                     <!-- Display current file if it exists -->
                     @if($task->filename)
@@ -129,7 +129,7 @@
             </div>
 
             <!-- Buttons -->
-            <div class="flex items-center justify-end gap-3 pt-4 mt-2 font-semibold">
+            <div class="flex items-center justify-end gap-3 pt-4 font-semibold">
                 <!-- Cancel -->
                 <button 
                     class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-xl cursor-pointer"

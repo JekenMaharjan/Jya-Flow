@@ -80,7 +80,7 @@
         </div>
 
         <!-- Status -->
-        <div class="relative flex-1">
+        <!-- <div class="relative flex-1">
             <label for="status" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Status</label>
             <select 
                 name="status" 
@@ -95,7 +95,7 @@
             @error('status')
                 <p class="absolute -bottom-5 left-1 text-xs text-red-400 font-medium">{{ $message }}</p>
             @enderror
-        </div>
+        </div> -->
 
         <!-- Action Buttons -->
         <div class="flex items-center justify-end gap-3 pt-4 mt-2">

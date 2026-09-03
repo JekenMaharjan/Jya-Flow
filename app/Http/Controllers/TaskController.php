@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -31,6 +32,9 @@ class TaskController extends Controller
         // Save array of paths into 'filename'
         $data['filename'] = $uploadedFiles;
 
+        // // When creating task initially every task is in progress
+        // $data['status'] = TaskStatus::IN_PROGRESS->value;
+
         // Create task
         $task = $request->user()->tasks()->create($data);
 
@@ -51,6 +55,8 @@ class TaskController extends Controller
         // Return back
         return back()->with('success', 'Task created successfully!');
     }
+
+    // ===============================================================
 
     // GET: Retrieve all Tasks with Filter Tasks
     public function index(Request $request)
@@ -113,6 +119,8 @@ class TaskController extends Controller
         return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount', 'lowTasksCount', 'mediumTasksCount', 'highTasksCount'));
     }
 
+    // ===============================================================
+
     // GET: Preview Task
     public function preview(Request $request, Task $task)
     {
@@ -131,20 +139,30 @@ class TaskController extends Controller
         ]);
     }
 
+    // ===============================================================
+
     // PUT: Change Task details
-    public function change(StoreTaskRequest $request, Task $task)
+    public function change(UpdateTaskRequest $request, Task $task)
     {
         // Validate incoming request
         $data = $request->validated();
 
-        if ($request->hasFile('filename')) {
-            // Delete previous file if exists
-            if ($task->filename) {
-                Storage::disk('public')->delete($task->filename);
+        // Create empty array to hold all the uploaded files
+        $updateUploadedFiles = [];
+
+        if ($request->hasFile('files')) {
+            // Foreach loop through each file and Delete previous file if exists
+            foreach ($task->filename as $file) {
+                Storage::disk('public')->delete($file);
+            }
+
+            // Foreach loop through each file
+            foreach ($request->file('files') as $file) {
+                $updateUploadedFiles[] = $file->store('uploads', 'public');
             }
 
             // Store new file
-            $data['filename'] = $request->file('filename')->store('uploads', 'public');
+            $data['filename'] = $updateUploadedFiles;
         }
 
         // Update task details using 'update' method
@@ -161,6 +179,8 @@ class TaskController extends Controller
         return back()->with('success', 'Task updated successfully!');
     }
 
+    // ===============================================================
+
     // PATCH: Update Task
     public function update(Task $task)
     {
@@ -174,6 +194,8 @@ class TaskController extends Controller
 
         return back()->with('success', "Status updated to {$newStatus->label()}");
     }
+
+    // ===============================================================
 
     // DELETE: Delete Task
     public function destroy(Task $task)
