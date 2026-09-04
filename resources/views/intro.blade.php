@@ -15,7 +15,7 @@
         <!-- Getting Started Button -->
         @auth
         <a
-            href="{{ route('tasks') }}"
+            href="{{ route('tasks.index') }}"
             class="bg-indigo-600 rounded-xl inline-block px-4 py-2 text-sm cursor-pointer hover:bg-indigo-500"
         >
             Dashboard

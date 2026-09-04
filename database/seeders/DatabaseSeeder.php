@@ -29,6 +29,8 @@ class DatabaseSeeder extends Seeder
         // // Generates 10 tasks
         // Task::factory(10)->create();
 
+        // -----------------------------------------------------------
+        
         // Create a known main user to login
         $user = User::factory()->create([
             'name' => 'Jeken Maharjan',

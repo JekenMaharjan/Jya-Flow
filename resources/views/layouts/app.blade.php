@@ -51,7 +51,7 @@
 
             <!-- Dashboard Button -->
             <a 
-                href="{{ route('tasks') }}"
+                href="{{ route('tasks.index') }}"
                 class="py-2 px-4 mt-2 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
             >
                 Dashboard

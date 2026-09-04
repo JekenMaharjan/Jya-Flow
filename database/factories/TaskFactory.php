@@ -24,7 +24,7 @@ class TaskFactory extends Factory
 
         $filenames = collect(range(1, fake()->numberBetween(1, 4)))->map(function () use ($allowedExtensions) {
             $extension = fake()->randomElement($allowedExtensions);
-            return 'uploads' . '/' . fake()->word() . '.' . $extension;
+            return 'uploads/' . fake()->word() . '.' . $extension;
         })->toArray();
 
         return [

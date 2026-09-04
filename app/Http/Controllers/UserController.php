@@ -7,16 +7,10 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function showUsers(User $user)
+    public function showUsers()
     {
-        // $usernames = User::latest()->pluck('name');
+        $users = User::get(['name', 'email']);
 
-        // $username = User::where('name', 'Jeken Maharjan')->firstOrFail();
-
-        // return $username;
-
-        return response()->json([
-            'name' => $user->name,
-        ]);
+        return view('users.users', compact('users'));
     }
 }
