@@ -17,33 +17,44 @@ uses(RefreshDatabase::class);
 // REGISTER
 test('new users can register successfully', function () {
     // Arrange & Act: Send registration form payload/data
-    $response = $this->post('/register', [
-        'name' => 'Example',
-        'email' => 'Example@gmail.com',
-        'password' => 'Example@123',
-        'password_confirmation' => 'Example@123',
+    // $response = $this->post('/register', [
+    //     'name' => 'Example',
+    //     'email' => 'Example@gmail.com',
+    //     'password' => 'Example@123',
+    //     'password_confirmation' => 'Example@123',
+    // ]);
+
+    // raw() generates fake attributes as an array without saving to DB
+    $user = User::factory()->raw([
+        'password' => 'password@123!',
+        'password_confirmation' => 'password@123!',
     ]);
+
+    $response = $this->post('/register', $user);
 
     // Assert: Check response redirect
     $response->assertRedirect('/login');
 
     // Assert: Check database holds the record
     $this->assertDatabaseHas('users', [
-        'email' => 'Example@gmail.com',
+        'email' => $user['email'],
     ]);
-
-    // Assert: Check user is currently authenticated in session
-    // $this->assertAuthenticated();
 });
 
 test('registration fails with invalid email', function () {
     // Arrange & Act: Send registration form payload/data    
-    $response = $this->post('/register', [
-        'name' => 'Example',
-        'email' => 'exampgmail',
-        'password' => 'Example@123',
-        'password_confirmation' => 'Example@123',
+    // $response = $this->post('/register', [
+    //     'name' => 'Example',
+    //     'email' => 'exampgmail',
+    //     'password' => 'Example@123',
+    //     'password_confirmation' => 'Example@123',
+    // ]);
+
+    $user = User::factory()->raw([
+        'email' => 'example.com'
     ]);
+
+    $response = $this->post('/register', $user);
 
     // Assert: Check that sesssion holds validation errors for the email field
     $response->assertSessionHasErrors(['email']);
@@ -55,15 +66,24 @@ test('registration fails with invalid email', function () {
 // LOGIN
 test('user can log in with valid credentials', function () {
     // Arrange: Create a user in the database using Factory
+    // $user = User::factory()->create([
+    //     'email' => 'Example@gmail.com',
+    //     'password' => bcrypt('Example@123'),
+    // ]);
+
     $user = User::factory()->create([
-        'email' => 'Example@gmail.com',
-        'password' => bcrypt('Example@123'),
+        'password' => bcrypt('password@123'),
     ]);
 
     // Act: Submit login request
+    // $response = $this->post('/login', [
+    //     'email' => 'Example@gmail.com',
+    //     'password' => 'Example@123',
+    // ]);
+
     $response = $this->post('/login', [
-        'email' => 'Example@gmail.com',
-        'password' => 'Example@123',
+        'email' => $user->email,
+        'password' => 'password@123',
     ]);
 
     // Assert: Verify redirect and auth status
@@ -74,14 +94,13 @@ test('user can log in with valid credentials', function () {
 test('user cannot log in with invalid password', function () {
     // Arrange: Create a user in the database using Factory
     $user = User::factory()->create([
-        'email' => 'Example@gmail.com',
-        'password' => bcrypt('Example@123'),
+        'password' => bcrypt('password@123'),
     ]);
 
     // Act: Submit login request
     $response = $this->post('/login', [
-        'email' => 'Example@gmail.com',
-        'password' => 'Example3124',
+        'email' => $user->email,
+        'password' => 'password12',
     ]);
 
     // Assert: Check that session holds validation errors for invalid password

@@ -91,7 +91,7 @@ class AuthController extends Controller
 
             // Redirect to intended destination
             return redirect()
-                ->intended(route('tasks'))
+                ->intended(route('tasks.index'))
                 ->with('success', 'User logged in successfully.');
         }
 
@@ -100,7 +100,7 @@ class AuthController extends Controller
         //     $request->session()->regenerate();
 
         //     return redirect()
-        //         ->intended(route('tasks'))
+        //         ->intended(route('tasks.index'))
         //         ->with('status', 'User logged in successfully.');
         // }
 
@@ -182,10 +182,10 @@ class AuthController extends Controller
     //         'message' => 'Logged in Successfully!',
     //         'token' => $token,
     //         'user' => $user,
-    //         'redirect' => route('api.tasks'),
+    //         'redirect' => route('api.tasks.index'),
     //     ], 200);
     //     }
 
-    //     return redirect()->route('tasks')->with('status', 'You have been logged in successfully.');
+    //     return redirect()->route('tasks.index')->with('status', 'You have been logged in successfully.');
     // }
 }
