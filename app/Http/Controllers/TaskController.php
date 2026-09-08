@@ -6,8 +6,11 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Mail\TaskCompleted;
+use App\Mail\TaskCreatedMail;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
@@ -32,17 +35,11 @@ class TaskController extends Controller
         // Save array of paths into 'filename'
         $data['filename'] = $uploadedFiles;
 
-        // // When creating task initially every task is in progress
-        // $data['status'] = TaskStatus::IN_PROGRESS->value;
-
         // Create task
         $task = $request->user()->tasks()->create($data);
 
-        // // TEST: Check response
-        // return response()->json([
-        //     'data' => $data,
-        //     'filename' => $files,
-        // ]);
+        // Queue the confirmation email to the user who created it
+        Mail::to($task->user)->queue(new TaskCreatedMail($task));
 
         // Return JSON respone
         if ($request->wantsJson()) {
@@ -53,7 +50,7 @@ class TaskController extends Controller
         }
         
         // Return back
-        return back()->with('success', 'Task created successfully!');
+        return back()->with('success', 'Task created & Notification sent successfully!');
     }
 
     // ===============================================================

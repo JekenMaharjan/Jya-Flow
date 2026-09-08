@@ -30,7 +30,7 @@ class StoreTaskRequest extends FormRequest
             'title' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:500'],
             
-            'files' => ['required', 'array', 'min:1'],
+            'files' => ['nullable', 'array', 'min:1'],
             'files.*' => ['file', 'mimes:pdf,doc,docx,jpg,png,txt', 'max:20480'],     // 20 MB max
             
             'due_at' => ['nullable', 'date', 'after_or_equal:today'],       // Allows today's date

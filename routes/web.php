@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
+use App\Mail\TaskCreatedMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 // Starting Route

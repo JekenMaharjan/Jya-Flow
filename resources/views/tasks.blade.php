@@ -89,16 +89,7 @@
         <ul class="space-y-3 mb-5">
             @forelse($tasks as $task)
                 <li 
-                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 {{ match($task->status) {
-                            TaskStatus::IN_PROGRESS => match($task->priority) {
-                                TaskPriority::LOW => 'bg-blue-300/20 hover:bg-blue-300/30',
-                                TaskPriority::MEDIUM => 'bg-yellow-300/20 hover:bg-yellow-300/30',
-                                TaskPriority::HIGH => 'bg-red-300/20 hover:bg-red-300/30',
-                                default => 'bg-gray-300/20 hover:bg-gray-300/30',
-                            },
-                            TaskStatus::COMPLETED => 'bg-green-300/20 hover:bg-green-300/30',
-                            default => 'bg-gray-300/20 hover:bg-gray-300/30',
-                        } }}"
+                    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 bg-slate-700/10 hover:bg-slate-700/20"
                     onclick="document.getElementById('previewTaskModal_{{ $task->id }}').showModal()"
                 >
                     <!-- First half -->
@@ -144,7 +135,7 @@
                             <button 
                                 type="submit"
                                 onclick="event.stopPropagation()"
-                                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-800 text-slate-300 border-slate-800 hover:bg-slate-800/70') }}"
+                                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-400/10 text-slate-300 border-slate-500/20 hover:bg-slate-500/30') }}"
                             >
                                 @if($task->status === TaskStatus::COMPLETED)
                                     <x-entypo-check class="h-4 w-4"/>
