@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="bg-slate-800 border-2 border-slate-700 p-10 rounded-2xl">
+<div class="bg-slate-800 border-2 border-slate-700 p-10 rounded-2xl max-w-6xl mx-auto">
     <p class="text-center font-lobster text-5xl p-5 mb-5">
         A platform built for a new way of working
     </p>

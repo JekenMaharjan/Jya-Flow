@@ -1,39 +1,45 @@
 # TASK MANAGEMENT APPLICATION
 
-A workflow and task management system designed to add tasks, track tasks progress and manage the tasks.
+A workflow and task management system designed to CRUD tasks, track tasks progress/status and manage the tasks.
 
 ---
 
 ## Overview
 
-**Task Management App** helps individuals to organize daily workflows and tasks and ensures tasks complete on time.
+**Task Management App** helps individuals to organize daily workflows and tasks and ensures tasks to complete on time.
 
 ### Key Features
 
 * **Authentication :** With proper Authentication, User can Register and Signin their account. 
 * **Tasks List :** User can view their tasks list with status(*Completed* & *InProgress*).
 * **Add Task :** User can add their tasks.
-* **Delete Task :** User can delete their tasks.
 * **Update Task :** User can toggle update their tasks between *Completed* & *InProgress*.
+* **Delete Task :** User can delete their tasks.
+* **Multi-File Attachment :** User can attach multiple files.
+* **Mail Notification :** User get mail after every creation of task.
 
 ---
 
 ## Preview
 
 <p align="center">
-  <img src="./.github/assets/intro.png" alt="Task Management Dashboard" width="800">
+    <h5>Intro Page</h5>
+    <img src="./.github/assets/intro.png" alt="Task Management Dashboard" width="800">
 </p>
 
 <p align="center">
-  <img src="./.github/assets/register.png" alt="Task Management Register" width="800">
+<h5>Register Page</h5>
+    <img src="./.github/assets/register.png" alt="Task Management Register" width="800">
 </p>
 
 <p align="center">
-  <img src="./.github/assets/signin.png" alt="Task Management Signin" width="800">
+<h5>Signin Page</h5>
+    <img src="./.github/assets/signin.png" alt="Task Management Signin" width="800">
 </p>
 
 <p align="center">
-  <img src="./.github/assets/tasks.png" alt="Task Management Tasks" width="800">
+<h5>Tasks Page</h5>
+    <img src="./.github/assets/tasks.png" alt="Task Management Tasks" width="800">
 </p>
 
 ---
@@ -44,6 +50,7 @@ A workflow and task management system designed to add tasks, track tasks progres
 * **Backend :** PHP 8.5.9 / Laravel 13.x
 * **Database :** Laravel SQLite
 * **Authentication :** Laravel Web Sessions & Laravel Sanctum (API Tokens)
+* **Mail Notification :** MailTrap & Resend
 * **Build Tool :** Vite
 * **Icons :** Blade Icons / Hero Icons
 * **Fonts :** Google Fonts
