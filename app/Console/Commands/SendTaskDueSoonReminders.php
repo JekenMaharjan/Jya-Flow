@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Enums\TaskStatus;
+use App\Jobs\SendDueReminderJob;
 use App\Mail\TaskDueDateSoonMail;
 use App\Models\Task;
 use Illuminate\Console\Command;
@@ -46,18 +47,8 @@ class SendTaskDueSoonReminders extends Command
         $count = 0;
 
         foreach ($tasks as $task) {
-            $recipientEmail = $task->user?->email;
-
-            if ($recipientEmail) {
-                // Mark as sent first to prevent race condition duplicates
-                $task->update(['due_soon_alert_sent' => true]);
-
-                // Queue the mailable asynchronously
-                Mail::to($recipientEmail)->queue(new TaskDueDateSoonMail($task));
-
-                $this->info("Queued 24h due reminder for Task #{$task->id} to {$recipientEmail}");
-                $count++;
-            }
+            SendDueReminderJob::dispatch($task);
+            $count++;
         }
 
         $this->info("Successfully processed {$count} task reminder(s).");
