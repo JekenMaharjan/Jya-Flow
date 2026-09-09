@@ -23,13 +23,13 @@ class TaskController extends Controller
         $data = $request->validated();
 
         // Change the user input date of nepal into UTC before saving into database
-        $data['due_at'] = Carbon::parse($data['due_at'], 'Asia/Kathmandu')
+        $data['due_at'] = Carbon::parse($request->input('due_at'), 'Asia/Kathmandu')
             ->setTimezone('UTC');
 
         // Create empty array to hold all the uploaded files
         $uploadedFiles = [];
 
-        // Checks request if there's any files or not   
+        // Checks requeszt if there's any files or not   
         if ($request->hasFile('files')) {
             // Foreach loop through each file
             foreach ($request->file('files') as $file) {

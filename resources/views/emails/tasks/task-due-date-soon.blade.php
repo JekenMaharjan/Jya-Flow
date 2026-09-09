@@ -133,7 +133,7 @@
         <!-- Body Content -->
         <div class="body">
             <p class="body-title">
-                This is a quick reminder that the task - "{{ ($task->title) }}" is due on {{ ($task->due_at)->format('M d, Y \a\t g:i A') }}. Here are the details:
+                This is a quick reminder that the task - "{{ ($task->title) }}" is due on {{ $task->due_at_nepal->format('Y-m-d \a\t h:i A') ?? 'No due date' }}. Here are the details:
             </p>
 
             <!-- Task Card -->
@@ -161,7 +161,7 @@
                         <strong>Due at:</strong> 
                         
                         <span class="task-due">
-                            {{ ($task->due_at)->format('M d, Y \a\t g:i A') }}
+                            {{ $task->due_at_nepal->format('Y-m-d \a\t h:i A') ?? 'No due date' }}
                         </span>
                     </p>
                 </div>

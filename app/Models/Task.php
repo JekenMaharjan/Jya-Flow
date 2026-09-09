@@ -42,7 +42,7 @@ class Task extends Model
     }
 
     // Accessor: Always fetch due_at in Nepal Time
-    public function getDueAtNepalAttribute()
+    public function getDueAtNepalAttribute()  // this creates due_at_nepal automatically i.e., getDueAtNepalAttribute() -> $task->due_at_nepal  as laravel converts due_at_nepal from snake_case to StudlyCase (DueAtNepal)
     {
         return $this->due_at ? $this->due_at->setTimezone('Asia/Kathmandu') : null;
     }

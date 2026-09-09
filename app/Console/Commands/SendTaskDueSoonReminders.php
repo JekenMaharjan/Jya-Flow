@@ -25,11 +25,10 @@ class SendTaskDueSoonReminders extends Command
      */
     public function handle(): void
     {
-        // Define the 24-hour target window (22h to 25h from now)
+        // Define the 24-hour target window (2hr to 3hr from now)
         // Timezome mismatch issue coz laravel default uses UTC timezone, change it to our country timezone
         $startWindow = now();
-        // $startWindow = now()->addHours(22);
-        $endWindow   = now()->addHours(25);
+        $endWindow   = now()->addHours(3);
 
         // Fetch uncompleted tasks approaching the 24h deadline
         $tasks = Task::with('user')

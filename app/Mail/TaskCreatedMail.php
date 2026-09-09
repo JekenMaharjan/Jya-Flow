@@ -32,17 +32,17 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
     {
         return new Envelope(
             subject: "New Task Created : '{$this->task->title}'",
-            from: new Address('JyaFlow@gmail.com', 'Task Management System'),
-            replyTo: [
-                new Address('JyaFlowSupport@gmail.com', 'Task Management System Support Team'),
-            ],
-            tags: ['task-system', 'creation-notice'],
-            metadata: [
-                'task_id' => (string) $this->task->id,
-                'user_id' => (string) $this->task->user_id,
-                'priority' => $this->task->priority->value ?? (string) $this->task->priority,
-                'status' => $this->task->status->value ?? 'pending',
-            ],
+            // from: new Address('JyaFlow@gmail.com', 'Task Management System'),
+            // replyTo: [
+            //     new Address('JyaFlowSupport@gmail.com', 'Task Management System Support Team'),
+            // ],
+            // tags: ['task-system', 'creation-notice'],
+            // metadata: [
+            //     'task_id' => (string) $this->task->id,
+            //     'user_id' => (string) $this->task->user_id,
+            //     'priority' => $this->task->priority->value ?? (string) $this->task->priority,
+            //     'status' => $this->task->status->value ?? 'pending',
+            // ],
         );
     }
 

@@ -32,11 +32,11 @@ class TaskDueDateSoonMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: "Task Due : '{$this->task->title}' is due on {$this->task->due_at}",
-            from: new Address('JyaFlow@gmail.com', 'Task Management System'),
-            replyTo: [
-                new Address('JyaFlowSupport@gmail.com', 'Task Management System Support Team'),
-            ],
-            tags: ['task-system', 'due-date-notice'],
+            // from: new Address('JyaFlow@gmail.com', 'Task Management System'),
+            // replyTo: [
+            //     new Address('JyaFlowSupport@gmail.com', 'Task Management System Support Team'),
+            // ],
+            // tags: ['task-system', 'due-date-notice'],
         );
     }
 
