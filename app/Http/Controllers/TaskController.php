@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateTaskRequest;
 use App\Mail\TaskCompleted;
 use App\Mail\TaskCreatedMail;
 use App\Models\Task;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,10 @@ class TaskController extends Controller
     {
         // Validate input data - PHP array
         $data = $request->validated();
+
+        // Change the user input date of nepal into UTC before saving into database
+        $data['due_at'] = Carbon::parse($data['due_at'], 'Asia/Kathmandu')
+            ->setTimezone('UTC');
 
         // Create empty array to hold all the uploaded files
         $uploadedFiles = [];
@@ -39,7 +44,7 @@ class TaskController extends Controller
         $task = $request->user()->tasks()->create($data);
 
         // Queue the confirmation email to the user who created it
-        Mail::to($task->user)->queue(new TaskCreatedMail($task));
+        Mail::to($request->user())->queue(new TaskCreatedMail($task));
 
         // Return JSON respone
         if ($request->wantsJson()) {
@@ -96,7 +101,9 @@ class TaskController extends Controller
         });
 
         // Fetch paginated tasks and append query parameters so pagination links preserve filter state
-        $tasks = $query->latest()->paginate(5)->withQueryString();
+        $tasks = $query->latest()
+            ->paginate(5)
+            ->withQueryString();
 
         // JSON Response for API clients
         if ($request->wantsJson()) {
@@ -162,6 +169,10 @@ class TaskController extends Controller
             $data['filename'] = $updateUploadedFiles;
         }
 
+        if ($task->isDirty('due_at')) {
+            $task->due_soon_alert_sent = false;
+        }
+
         // Update task details using 'update' method
         $task->update($data);
             
@@ -181,15 +192,14 @@ class TaskController extends Controller
     // PATCH: Update Task
     public function update(Task $task)
     {
-        // Toggle strictly between the two enum values
-        $newStatus = ($task->status === TaskStatus::COMPLETED)
-            ? TaskStatus::IN_PROGRESS 
-            : TaskStatus::COMPLETED;
+        if ($task['status'] === TaskStatus::COMPLETED) {
+            return back()->with('info', 'Status is completed, action skipped.');
+        }
 
         // Eloquent only updates the 'status' column in the database
-        $task->update(['status' => $newStatus]);
-
-        return back()->with('success', "Status updated to {$newStatus->label()}");
+        $task->update(['status' => TaskStatus::COMPLETED]);
+        
+        return back()->with('success', "Status updated to Completed.");
     }
 
     // ===============================================================

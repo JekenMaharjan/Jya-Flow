@@ -13,7 +13,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
-class TaskCreatedMail extends Mailable  implements ShouldQueue
+class TaskDueDateSoonMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -31,18 +31,12 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "New Task Created : '{$this->task->title}'",
+            subject: "Task Due : '{$this->task->title}' is due on {$this->task->due_at}",
             from: new Address('JyaFlow@gmail.com', 'Task Management System'),
             replyTo: [
                 new Address('JyaFlowSupport@gmail.com', 'Task Management System Support Team'),
             ],
-            tags: ['task-system', 'creation-notice'],
-            metadata: [
-                'task_id' => (string) $this->task->id,
-                'user_id' => (string) $this->task->user_id,
-                'priority' => $this->task->priority->value ?? (string) $this->task->priority,
-                'status' => $this->task->status->value ?? 'pending',
-            ],
+            tags: ['task-system', 'due-date-notice'],
         );
     }
 
@@ -51,15 +45,12 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
      */
     public function content(): Content
     {
-        // Render the blade view with the task data
-        $html = view('emails.tasks.task-created', ['task' => $this->task])->render();
+        $html = view('emails.tasks.task-due-date-soon', ['task' => $this->task])->render();
         
-        // Inline the CSS using the bundled CssToInlineStyles class
-        $inlinedHtml = (new CssToInlineStyles())->convert($html);
-        
-        // Return as a raw HTML string Content object
+        $inlineHtml = (new CssToInlineStyles())->convert($html);
+
         return new Content(
-            htmlString: $inlinedHtml,
+            htmlString: $inlineHtml,
         );
     }
 

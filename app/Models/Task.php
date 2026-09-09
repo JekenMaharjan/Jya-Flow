@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Task extends Model
 {
@@ -20,6 +21,7 @@ class Task extends Model
         'due_at',
         'priority',
         'status',
+        'due_soon_alert_sent',
     ];
     
     protected function casts(): array
@@ -29,6 +31,7 @@ class Task extends Model
             'status' => TaskStatus::class,
             'due_at' => 'datetime',
             'filename' => 'array',
+            'due_soon_alert_sent' => 'boolean',
         ];
     }
 
@@ -36,5 +39,11 @@ class Task extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Accessor: Always fetch due_at in Nepal Time
+    public function getDueAtNepalAttribute()
+    {
+        return $this->due_at ? $this->due_at->setTimezone('Asia/Kathmandu') : null;
     }
 }

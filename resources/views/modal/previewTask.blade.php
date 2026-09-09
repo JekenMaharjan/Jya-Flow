@@ -79,6 +79,7 @@
                 <div class="flex w-full gap-3">   
                     <div class="flex flex-col w-full">
                         <label for="due_at" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Due Date</label>
+                        <p class="text-slate-400 font-light text-xs mb-3">Current time in UTC : {{ now()->format('Y-m-d \a\t h:i A') }}</p>
                         <input 
                             type="datetime-local"
                             name="due_at"

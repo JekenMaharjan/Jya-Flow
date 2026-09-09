@@ -123,7 +123,7 @@
 
                         <!-- Task due date and time -->
                         <span class="text-[11px] font-light text-gray-400 font-roboto">
-                            {{ $task->due_at ? $task->due_at->format('M d, Y h:i A') : 'No due date' }}
+                            {{ $task->due_at->format('Y-m-d \a\t h:i A') ?? 'No due date' }}
                         </span>
                     </div>
 

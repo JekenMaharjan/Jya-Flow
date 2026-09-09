@@ -133,7 +133,7 @@
         <!-- Body Content -->
         <div class="body">
             <p class="body-title">
-                Your task has been created successfully! Here are the details:
+                This is a quick reminder that the task - "{{ ($task->title) }}" is due on {{ ($task->due_at)->format('M d, Y \a\t g:i A') }}. Here are the details:
             </p>
 
             <!-- Task Card -->
@@ -158,7 +158,7 @@
                     </p>
 
                     <p>
-                        <strong>Due Date:</strong> 
+                        <strong>Due at:</strong> 
                         
                         <span class="task-due">
                             {{ ($task->due_at)->format('M d, Y \a\t g:i A') }}
@@ -170,14 +170,14 @@
             <!-- Call to Action Button -->
             <div class="btn-div">
                 <a href="{{ url('/tasks/' . $task->id) }}" class="btn">
-                    View Your Task Listing
+                    View Your Task
                 </a>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            Sent automatically by {{ config('app.name') }}
+            Deadlines aren't just dates—they're our commitment to progress.
         </div>
     </div>
 </div>

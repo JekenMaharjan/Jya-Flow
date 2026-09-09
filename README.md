@@ -118,7 +118,7 @@ The development of Task Management App is organized into structured phases to en
 Contributions are welcome and appreciated. To maintain code quality and consistency, please follow the steps below:
 
 1. **Fork the Repository**  
-    Click the Fork button on GitHub to create your own copy of the repository.
+    <small>Click the Fork button on GitHub to create your own copy of the repository.</small>
 
 2. **Clone Your Fork**  
     ```bash
@@ -127,16 +127,16 @@ Contributions are welcome and appreciated. To maintain code quality and consiste
     ```
 
 3. **Create a Feature Branch**  
-    Always create a new branch from main for your feature or fix:
+    <small>Always create a new branch from main for your feature or fix:</small>
     ```bash
     git checkout -b feature/your-feature-name
     ```
 
 4. **Make Your Changes**  
-    Follow the existing project structure and coding conventions.
+    <small>Follow the existing project structure and coding conventions.</small>
 
 5. **Commit Your Changes**  
-    Write meaningful commit messages:
+    <small>Write meaningful commit messages:</small>
     ```bash
     git commit -m "message..."
     ```
@@ -147,11 +147,11 @@ Contributions are welcome and appreciated. To maintain code quality and consiste
     ```
 
 7. **Open a Pull Request**  
-    Go to the original repository and open a Pull Request.  
-    Provide a clear description of:  
-    - What you implemented
-    - Why it was needed
-    - Any screenshots (if UI changes)
+    <small>Go to the original repository and open a Pull Request.</small>  
+    <small>Provide a clear description of:</small>  
+    - <small>What you implemented</small>
+    - <small>Why it was needed</small>
+    - <small>Any screenshots (if UI changes)</small>
 
 ---
 
