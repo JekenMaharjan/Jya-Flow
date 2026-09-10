@@ -153,7 +153,7 @@
                             @method('DELETE')
                             <button 
                                 type="submit"
-                                onclick="event.stopPropagation()"
+                                onclick="event.stopPropagation(); return confirm('Are you sure you want to delete this task?');"
                                 class="text-xs px-3 py-1.5 rounded-lg flex gap-2 items-center font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
                             >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

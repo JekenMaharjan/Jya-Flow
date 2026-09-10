@@ -5,6 +5,8 @@ use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Mail\TaskCreatedMail;
+use App\Mail\TaskDeletedMail;
+use App\Models\Task;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,11 @@ Route::get('/', function () {
 Route::controller(UserController::class)->group(function () {
     Route::get('/users', 'showUsers')->name('users');
 });
+
+// Preview Mail
+// Route::get('test', function () {
+//     return new TaskDeletedMail();
+// });
 
 // Guest Routes (Only accessible when NOT logged in)
 Route::middleware('guest')->controller(AuthController::class)->group(function () {

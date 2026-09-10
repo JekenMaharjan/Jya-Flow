@@ -6,23 +6,21 @@ use App\Models\Task;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
-class TaskCreatedMail extends Mailable  implements ShouldQueue
+class TaskDeletedMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public Task $task;
-
+    public array $task;
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task)
+    public function __construct(array $task)
     {
         $this->task = $task;
     }
@@ -32,8 +30,10 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
      */
     public function envelope(): Envelope
     {
+        $title = $this->task['title'] ?? 'Task';
+
         return new Envelope(
-            subject: "New Task Created : '{$this->task->title}'",
+            subject: "Task - '$title' has been deleted.",
         );
     }
 
@@ -42,11 +42,8 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
      */
     public function content(): Content
     {
-        // Ensure user relation is loaded for the view
-        $this->task->loadMissing('user');
-
         // Render the blade view with the task data
-        $html = view('emails.tasks.task-created', ['task' => $this->task])->render();
+        $html = view('emails.tasks.task-deleted', ['task' => $this->task])->render();
         
         // Inline the CSS using the bundled CssToInlineStyles class
         $inlinedHtml = (new CssToInlineStyles())->convert($html);

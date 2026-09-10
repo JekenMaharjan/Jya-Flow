@@ -126,25 +126,25 @@
         <!-- Header -->
         <div class="header">
             <h1 class="header-title">
-                Hello, {{ $task->user->name }}!
+                Hello, {{ $task['user_id']['name'] ?? 'User' }}!
             </h1>
         </div>
 
         <!-- Body Content -->
         <div class="body">
             <p class="body-title">
-                Your task has been created successfully! Here are the details:
+                Your task has been deleted successfully! Here are the details:
             </p>
 
             <!-- Task Card -->
             <div class="task-card">
                 <h2 class="task-title">
-                    {{ $task->title }}
+                    {{ $task['title'] ?? 'Untitled Task' }}
                 </h2>
                 
-                @if($task->description)
+                @if(!empty($task['description']))
                     <p class="task-description">
-                        {{ $task->description }}
+                        {{ $task['description'] }}
                     </p>
                 @endif
 
@@ -153,15 +153,16 @@
                         <strong>Priority:</strong> 
 
                         <span class="task-priority">
-                            {{ ucfirst($task->priority->value ?? $task->priority) }}
+                            {{ ucfirst(is_array($task['priority']) ? $task['priority']['value'] : $task['priority']) }}
                         </span>
                     </p>
 
                     <p>
                         <strong>Due at:</strong> 
+                        
                         <span class="task-due">
-                            @if(!empty($task->due_at_nepal))
-                                {{ $task->due_at_nepal->format('Y-m-d \a\t h:i A') }}
+                            @if(!empty($task['due_at']))
+                                {{ \Carbon\Carbon::parse($task['due_at'])->setTimezone('Asia/Kathmandu')->format('Y-m-d \a\t h:i A') }}
                             @else
                                 No due date
                             @endif
@@ -172,7 +173,7 @@
 
             <!-- Call to Action Button -->
             <div class="btn-div">
-                <a href="{{ url('/tasks/' . $task->id) }}" class="btn">
+                <a href="{{ url('/tasks') }}" class="btn">
                     View Your Task Listing
                 </a>
             </div>

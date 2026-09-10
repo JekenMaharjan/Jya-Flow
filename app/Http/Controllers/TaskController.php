@@ -8,6 +8,7 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Mail\TaskCompleted;
 use App\Mail\TaskCreatedMail;
+use App\Mail\TaskDeletedMail;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,14 +23,14 @@ class TaskController extends Controller
         // Validate input data - PHP array
         $data = $request->validated();
 
-        // Change the user input date of nepal into UTC before saving into database
+        // Convert Nepal time to UTC safely if due_at is provided
         $data['due_at'] = Carbon::parse($request->input('due_at'), 'Asia/Kathmandu')
             ->setTimezone('UTC');
 
         // Create empty array to hold all the uploaded files
         $uploadedFiles = [];
 
-        // Checks requeszt if there's any files or not   
+        // Checks request if there's any files or not   
         if ($request->hasFile('files')) {
             // Foreach loop through each file
             foreach ($request->file('files') as $file) {
@@ -40,17 +41,17 @@ class TaskController extends Controller
         // Save array of paths into 'filename'
         $data['filename'] = $uploadedFiles;
 
-        // Create task
+        // Create task associated with the logged-in user
         $task = $request->user()->tasks()->create($data);
 
         // Queue the confirmation email to the user who created it
-        Mail::to($request->user())->queue(new TaskCreatedMail($task));
+        Mail::to($request->user()->email)->queue(new TaskCreatedMail($task));
 
         // Return JSON respone
         if ($request->wantsJson()) {
             return response()->json([
                 'message' => 'Task created successfully!',
-                'task' => $task->load('user', 'files')   // Includes user info and files in JSON response
+                'task'    => $task->load('user'),
             ], 201);
         }
         
@@ -205,18 +206,32 @@ class TaskController extends Controller
     // ===============================================================
 
     // DELETE: Delete Task
-    public function destroy(Task $task)
+    public function destroy(Request $request, Task $task)
     {
-        // Check if the task record in the DB has a file path stored
         if ($task->filename) {
-            // Delete the physical file from the disk(public folder)
-            Storage::disk('public')->delete($task->filename);
+            // Ensure array handling for filenames
+            $files = is_array($task->filename) ? $task->filename : [$task->filename];
+            foreach ($files as $file) {
+                Storage::disk('public')->delete($file);
+            }
         }
 
-        // Delete the content from the database using 'delete' method
+        // Capture task attributes as an array BEFORE deletion
+        $taskData = $task->toArray();
+
+        // Delete the task record
         $task->delete();
 
-        // Return back to the same page
+        // Dispatch the queue mail with the plain array
+        Mail::to($request->user()->email)->queue(new TaskDeletedMail($taskData));
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Task deleted successfully!',
+                'deleted_task' => $taskData
+            ]);
+        }
+
         return back()->with('success', 'Task deleted successfully.');
     }
 }

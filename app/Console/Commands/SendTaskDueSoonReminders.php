@@ -19,38 +19,42 @@ class SendTaskDueSoonReminders extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Send email reminders for tasks due in 24 hours';
+    protected $description = 'Send email reminders for tasks due in next 3 hours';
 
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        // Define the 24-hour target window (2hr to 3hr from now)
-        // Timezome mismatch issue coz laravel default uses UTC timezone, change it to our country timezone
+        // Define the 3-hour target window (3hr from now)
         $startWindow = now();
         $endWindow   = now()->addHours(3);
 
-        // Fetch uncompleted tasks approaching the 24h deadline
+        // Fetch uncompleted tasks approaching the 3h deadline
         $tasks = Task::with('user')
-            ->where('status', '!=', TaskStatus::COMPLETED->value)
+            ->where('status', '!=', TaskStatus::COMPLETED)
             ->where('due_soon_alert_sent', false)
             ->whereNotNull('due_at')
             ->whereBetween('due_at', [$startWindow, $endWindow])
             ->get();
 
         if ($tasks->isEmpty()) {
-            $this->info('No tasks due in the next 24 hours.');
+            $this->info('No tasks due in the next 3 hours.');
             return;
         }
 
         $count = 0;
 
         foreach ($tasks as $task) {
+            // Skip if user doesn't exist
+            if (!$task->user) {
+                continue;
+            }
+
+            // Dispatch Job
             SendDueReminderJob::dispatch($task);
             $count++;
         }
-
         $this->info("Successfully processed {$count} task reminder(s).");
     }
 }

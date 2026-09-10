@@ -2,7 +2,7 @@
 <dialog id="previewTaskModal_{{ $task->id }}" class="fixed inset-0 m-auto p-6 w-2xl rounded-xl backdrop-blur-lg bg-slate-700/50 text-white backdrop:bg-black/50">
     
     <!-- Update Form -->
-    <form action="{{ route('tasks.change', $task->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('tasks.change', $task) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -13,7 +13,7 @@
             <div class="flex flex-col items-center gap-4">
 
                 <!-- Title -->
-                <div class="flex flex-col w-full">
+                <div class="flex flex-col w-full relative">
                     <label for="title" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Title</label>
                     <input 
                         type="text"
@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Description -->
-                <div class="flex flex-col w-full">
+                <div class="flex flex-col w-full relative">
                     <label for="description" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Description</label>
                     <textarea rows="4" placeholder="Add Description..." name="description" id="description" class="w-full max-h-48 overflow-y-auto px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/10 transition-all duration-200">{{ old('description', $task->description) }}</textarea>
                     @error('description')
@@ -37,11 +37,11 @@
                 </div>
 
                 <!-- File Upload -->
-                <div class="flex flex-col w-full gap-3">
+                <div class="flex flex-col w-full gap-3 relative">
                     <label for="filename" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Upload File</label>
 
                     <!-- Display current file if it exists -->
-                    @if($task->filename)
+                    @if(!empty($task->filename))
                         <div class="mb-2 flex flex-col gap-2 justify-between px-4 py-2 bg-slate-800/80 border border-white/10 rounded-xl">
                             @foreach($task->filename as $file)    
                                 <div class="flex gap-5">
@@ -64,7 +64,8 @@
 
                     <!-- File input for new file upload -->
                     <input 
-                        type="file" 
+                        type="file"
+                        id="files_{{ $task->id }}"
                         name="files[]"
                         multiple
                         class="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer transition-all duration-200"
@@ -76,7 +77,7 @@
                 </div>
 
                 <!-- Due Date and Time-->
-                <div class="flex w-full gap-3">   
+                <div class="flex w-full gap-3 relative">   
                     <div class="flex flex-col w-full">
                         <label for="due_at" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Due Date</label>
                         <p class="text-slate-400 font-light text-xs mb-3">Current time in UTC : {{ now()->format('Y-m-d \a\t h:i A') }}</p>
@@ -94,7 +95,7 @@
                 </div>
 
                 <!-- Priority -->
-                <div class="flex flex-col w-full">
+                <div class="flex flex-col w-full relative">
                     <label for="priority" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Priority</label>
                     <select 
                         name="priority"
@@ -102,7 +103,7 @@
                         class="w-full px-4 py-3 rounded-xl cursor-pointer bg-slate-900 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
                     >
                         <option value="" disabled {{ old('priority', $task->priority) ? '' : 'selected' }}>Choose a priority</option>
-                        <option value="low" @selected(strtolower(trim(old('priority', $task->priority?->value))) === 'low')>Low</option>
+                        <option value="low" @selected(old('priority', $task->priority?->value) === 'low')>Low</option>
                         <option value="medium" @selected(old('priority', $task->priority?->value) === 'medium')>Medium</option>
                         <option value="high" @selected(old('priority', $task->priority?->value) === 'high')>High</option>
                     </select>
@@ -112,7 +113,7 @@
                 </div>
 
                 <!-- Status -->
-                <div class="flex flex-col w-full">       
+                <div class="flex flex-col w-full relative">       
                     <label for="status" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Status</label>
                     <select 
                         name="status"
@@ -133,6 +134,7 @@
             <div class="flex items-center justify-end gap-3 pt-4 font-semibold">
                 <!-- Cancel -->
                 <button 
+                    type="button"
                     class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-xl cursor-pointer"
                     onclick="document.getElementById('previewTaskModal_{{ $task->id }}').close()"
                     >
