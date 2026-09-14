@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Task\CreateTaskAction;
+use App\Actions\Task\ShowTaskAction;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
@@ -31,67 +32,24 @@ class TaskController extends Controller
 
     // ===============================================================
 
-    // GET: Retrieve all Tasks with Filter Tasks
+    // GET: Retrieve all tasks with filter tasks
     public function index(Request $request)
     {
-        $user = $request->user();
-        // Safety Check: Ensure user is logged in
-        if (!$user) {
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'message' => 'Unauthenticated user.'
-                ], 401);
-            }
-            return redirect()->route('login');
-        }
-        
-        // For tasks counts
-        $forTasksCount = $user->tasks()->get();
+        // Run action to retrieve taskgis with filters
+        $result = ShowTaskAction::run(
+            user: $request->user(),
+            filters: $request->only(['status', 'priority'])
+        );
 
-        // Get total, in_progress & completed status counts for counts display
-        $totalTasksCount = $forTasksCount->count();
-        $inProgressTasksCount = $forTasksCount->where('status', TaskStatus::IN_PROGRESS->value ?? 'in_progress')->count();
-        $completedTasksCount = $forTasksCount->where('status', TaskStatus::COMPLETED->value ?? 'completed')->count(); 
-
-        // Get low, medium & high priority counts for counts display
-        $lowTasksCount = $forTasksCount->where('priority', TaskPriority::LOW->value ?? 'low')->count();
-        $mediumTasksCount = $forTasksCount->where('priority', TaskPriority::MEDIUM->value ?? 'medium')->count();
-        $highTasksCount = $forTasksCount->where('priority', TaskPriority::HIGH->value ?? 'high')->count();
-
-        // Start query scoped to the logged-in user
-        $query = $user->tasks()->with('user');
-
-        // Conditionally apply the status filter if provided (and not 'all')
-        $query->when($request->filled('status') && $request->status !== 'all', function ($q) use ($request) {
-            $q->where('status', $request->status);
-        });
-
-        // Similarly for the priority filter if provided
-        $query->when($request->filled('priority') && $request->priority !== 'all', function ($q) use ($request) {
-            $q->where('priority', $request->priority);
-        });
-
-        // Fetch paginated tasks and append query parameters so pagination links preserve filter state
-        $tasks = $query->latest()
-            ->paginate(5)
-            ->withQueryString();
-
-        // JSON Response for API clients
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Filtered Tasks',
-                'total tasks' => $totalTasksCount,
-                'in_progress tasks' => $inProgressTasksCount,
-                'completed tasks' => $completedTasksCount,
-                'low tasks' => $lowTasksCount,
-                'medium tasks' => $mediumTasksCount,
-                'high tasks' => $highTasksCount,
-                'tasks' => $tasks,
-            ], 200);
-        }
-
-        // Return Filtered Tasks
-        return view('tasks', compact('tasks', 'totalTasksCount', 'inProgressTasksCount', 'completedTasksCount', 'lowTasksCount', 'mediumTasksCount', 'highTasksCount'));
+        return view('tasks', [
+            'tasks'                 => $result['tasks'],
+            'totalTasksCount'       => $result['counts']['total'],
+            'inProgressTasksCount'  => $result['counts']['in_progress'],
+            'completedTasksCount'   => $result['counts']['completed'],
+            'lowTasksCount'         => $result['counts']['low'],
+            'mediumTasksCount'      => $result['counts']['medium'],
+            'highTasksCount'        => $result['counts']['high'],
+        ]);
     }
 
     // ===============================================================
