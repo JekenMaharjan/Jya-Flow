@@ -27,7 +27,7 @@ class AuthController extends Controller
     public function register(RegisterAuthRequest $request)
     {
         // Pass validated data into Action
-        RegisterUserAction::run($request->validated());
+        $user = RegisterUserAction::run($request->validated());
 
         return redirect()
             ->route('login')
@@ -49,11 +49,12 @@ class AuthController extends Controller
             ->with('success', 'User logged in successfully.');
     }
 
-    // POST: Logout User
+    // POST: User logout
     public function logout(Request $request)
     {
         Auth::logout();
 
+        // Invalidate web session & regenerate CSRF token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

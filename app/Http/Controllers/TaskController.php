@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Task\CreateTaskAction;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
-use App\Mail\TaskCompleted;
-use App\Mail\TaskCreatedMail;
 use App\Mail\TaskDeletedMail;
 use App\Models\Task;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -20,43 +18,15 @@ class TaskController extends Controller
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
-        // Validate input data - PHP array
-        $data = $request->validated();
+        // Run action to create task, upload files & queue email
+        $task = CreateTaskAction::run(
+            user: $request->user(),
+            data: $request->validated(),
+            files: $request->file('files', [])
+        );
 
-        // Convert Nepal time to UTC safely if due_at is provided
-        $data['due_at'] = Carbon::parse($request->input('due_at'), 'Asia/Kathmandu')
-            ->setTimezone('UTC');
-
-        // Create empty array to hold all the uploaded files
-        $uploadedFiles = [];
-
-        // Checks request if there's any files or not   
-        if ($request->hasFile('files')) {
-            // Foreach loop through each file
-            foreach ($request->file('files') as $file) {
-                $uploadedFiles[] = $file->store('uploads', 'public');
-            }
-        }
-
-        // Save array of paths into 'filename'
-        $data['filename'] = $uploadedFiles;
-
-        // Create task associated with the logged-in user
-        $task = $request->user()->tasks()->create($data);
-
-        // Queue the confirmation email to the user who created it
-        Mail::to($request->user()->email)->queue(new TaskCreatedMail($task));
-
-        // Return JSON respone
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Task created successfully!',
-                'task'    => $task->load('user'),
-            ], 201);
-        }
-        
-        // Return back
-        return back()->with('success', 'Task created & Notification sent successfully!');
+        return back()
+            ->with('success', 'Task created & Notification sent successfully!');
     }
 
     // ===============================================================
