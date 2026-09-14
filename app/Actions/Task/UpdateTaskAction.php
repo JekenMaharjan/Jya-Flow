@@ -3,7 +3,6 @@
 namespace App\Actions\Task;
 
 use App\Models\Task;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -12,7 +11,7 @@ class UpdateTaskAction
 {
     use AsAction;
 
-    public function handle(Task $task, array $data, array $files = []):Task
+    public function handle(Task $task, array $data, array $files = []): Task
     {
         // Convert Nepal time (NPT) into UTC if due_at is provided
         if (! empty($data['due_at'])) {
@@ -25,7 +24,9 @@ class UpdateTaskAction
             // Delete old physical files from public storage
             if (is_array($task->filename)) {
                 foreach ($task->filename as $oldFile) {
-                    Storage::disk('public')->delete($oldFile);
+                    if (Storage::disk('public')->exists($oldFile)){
+                        Storage::disk('public')->delete($oldFile);
+                    }
                 }
             }
 

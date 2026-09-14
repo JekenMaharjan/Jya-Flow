@@ -31,9 +31,10 @@ class CreateTaskAction
 
         // Create task owned by the authenticated user
         $task = $user->tasks()->create($data);
+        $userEmail = $task->user->email;
 
         // Queue confimation email
-        Mail::to($user->email)->queue(new TaskCreatedMail($task));
+        Mail::to($userEmail)->queue(new TaskCreatedMail($task));
 
         return $task;
     }

@@ -3,34 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Task\CreateTaskAction;
+use App\Actions\Task\DeleteTaskAction;
 use App\Actions\Task\ShowTaskAction;
 use App\Actions\Task\UpdateTaskAction;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
-use App\Mail\TaskDeletedMail;
 use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
+        // Safely extract uploaded files array or fallback to an empty array
+        $files = $request->hasFile('files') ? $request->file('files') : [];
+
         // Run action to create task, upload files & queue email
         $task = CreateTaskAction::run(
             user: $request->user(),
             data: $request->validated(),
-            files: $request->file('files', [])
+            files: $files
         );
 
         return back()
             ->with('success', 'Task created & Notification sent successfully!');
     }
-
-    // ===============================================================
 
     // GET: Retrieve all tasks with filter tasks
     public function index(Request $request)
@@ -52,8 +51,6 @@ class TaskController extends Controller
         ]);
     }
 
-    // ===============================================================
-
     // GET: Preview Task
     public function preview(Request $request, Task $task)
     {
@@ -72,21 +69,20 @@ class TaskController extends Controller
         ]);
     }
 
-    // ===============================================================
-
     // PUT: Change Task details
     public function change(UpdateTaskRequest $request, Task $task)
     {
+        // Safely extract uploaded files array or fallback to an empty array
+        $files = $request->hasFile('files') ? $request->file('files') : [];
+
         UpdateTaskAction::run(
             task: $task,
             data: $request->validated(),
-            files: $request->file('files', [])
+            files: $files
         );
 
-    return back()->with('success', 'Task updated successfully!');
+        return back()->with('success', 'Task updated successfully!');
     }
-
-    // ===============================================================
 
     // PATCH: Update Task
     public function update(Task $task)
@@ -101,34 +97,10 @@ class TaskController extends Controller
         return back()->with('success', "Status updated to Completed.");
     }
 
-    // ===============================================================
-
     // DELETE: Delete Task
-    public function destroy(Request $request, Task $task)
+    public function destroy(Task $task)
     {
-        if ($task->filename) {
-            // Ensure array handling for filenames
-            $files = is_array($task->filename) ? $task->filename : [$task->filename];
-            foreach ($files as $file) {
-                Storage::disk('public')->delete($file);
-            }
-        }
-
-        // Capture task attributes as an array BEFORE deletion
-        $taskData = $task->toArray();
-
-        // Delete the task record
-        $task->delete();
-
-        // Dispatch the queue mail with the plain array
-        Mail::to($request->user()->email)->queue(new TaskDeletedMail($taskData));
-
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Task deleted successfully!',
-                'deleted_task' => $taskData
-            ]);
-        }
+        DeleteTaskAction::run($task);
 
         return back()->with('success', 'Task deleted successfully.');
     }
