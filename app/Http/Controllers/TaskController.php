@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Task\CreateTaskAction;
 use App\Actions\Task\ShowTaskAction;
-use App\Enums\TaskPriority;
+use App\Actions\Task\UpdateTaskAction;
 use App\Enums\TaskStatus;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
@@ -77,43 +77,13 @@ class TaskController extends Controller
     // PUT: Change Task details
     public function change(UpdateTaskRequest $request, Task $task)
     {
-        // Validate incoming request
-        $data = $request->validated();
+        UpdateTaskAction::run(
+            task: $task,
+            data: $request->validated(),
+            files: $request->file('files', [])
+        );
 
-        // Create empty array to hold all the uploaded files
-        $updateUploadedFiles = [];
-
-        if ($request->hasFile('files')) {
-            // Foreach loop through each file and Delete previous file if exists
-            foreach ($task->filename as $file) {
-                Storage::disk('public')->delete($file);
-            }
-
-            // Foreach loop through each file
-            foreach ($request->file('files') as $file) {
-                $updateUploadedFiles[] = $file->store('uploads', 'public');
-            }
-
-            // Store new file
-            $data['filename'] = $updateUploadedFiles;
-        }
-
-        if ($task->isDirty('due_at')) {
-            $task->due_soon_alert_sent = false;
-        }
-
-        // Update task details using 'update' method
-        $task->update($data);
-            
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Task updated successfully!',
-                'updated_task' => $task
-            ]);
-        }
-
-        // Return back to the same page
-        return back()->with('success', 'Task updated successfully!');
+    return back()->with('success', 'Task updated successfully!');
     }
 
     // ===============================================================

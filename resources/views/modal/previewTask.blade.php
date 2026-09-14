@@ -80,12 +80,11 @@
                 <div class="flex w-full gap-3 relative">   
                     <div class="flex flex-col w-full">
                         <label for="due_at" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Due Date</label>
-                        <p class="text-slate-400 font-light text-xs mb-3">Current time in UTC : {{ now()->format('Y-m-d \a\t h:i A') }}</p>
                         <input 
                             type="datetime-local"
                             name="due_at"
                             id="due_at"
-                            value="{{ old('due_at', $task->due_at ? $task->due_at->format('Y-m-d\TH:i') : '') }}"
+                            value="{{ old('due_at', $task->due_at_nepal ? $task->due_at_nepal->format('Y-m-d\TH:i') : '') }}"
                             class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 focus:bg-white/10 transition-all duration-200"
                         >
                     </div>
