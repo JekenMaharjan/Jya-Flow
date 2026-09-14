@@ -33,7 +33,7 @@ class TaskCreatedMail extends Mailable  implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "New Task Created : '{$this->task->title}'",
+            subject: "Task Created : '{$this->task->title}'",
         );
     }
 

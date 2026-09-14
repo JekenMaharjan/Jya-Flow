@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Auth\LoginUserAction;
+use App\Actions\Auth\RegisterUserAction;
 use App\Http\Requests\LoginAuthRequest;
 use App\Http\Requests\RegisterAuthRequest;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -26,32 +26,8 @@ class AuthController extends Controller
     // POST: User registration
     public function register(RegisterAuthRequest $request)
     {
-        // Validate incoming request
-        $credentials = $request->validated();
-
-        // Create the user
-        $user = User::create([
-            'name' => $credentials['name'],
-            'email' => $credentials['email'],
-            'password' => Hash::make($credentials['password']),     // Hasing the password before storing it into database
-        ]);
-
-        // // Immediately login user after registration
-        // Auth::login($user);
-
-        // // TEST: Check response
-        // return response()->json([
-        //     'user_credentials' => $credentials,
-        //     'database_user_credentials' => $user
-        // ]);
-
-        // Return JSON response
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'User created successfully.',
-                'user_data' => $user
-            ], 201);    // '201' status code for created
-        }
+        // Pass validated data into Action
+        RegisterUserAction::run($request->validated());
 
         return redirect()
             ->route('login')
@@ -61,53 +37,16 @@ class AuthController extends Controller
     // POST: User login
     public function login(LoginAuthRequest $request)
     {
-        // Validated entered credentials
-        $credentials = $request->validated();
+        // Verify credentials via Action (throws error if invalid)
+        $user = LoginUserAction::run($request->validated());
 
-        // Find user's credentials stored in database which matches entered credentials email and get the first user's data that matches the email
-        $user = User::where('email', $credentials['email'])->first();
-        
-        // // TEST: Check response
-        // return response()->json([
-        //     'user_credentials' => $credentials,
-        //     'database_user_credentials' => $user
-        // ]);
+        // Start session & prevent Session Fixation attacks
+        Auth::login($user);
+        $request->session()->regenerate();
 
-        // Check user exists and verify password hash
-        if ($user && Hash::check($credentials['password'], $user->password)) {
-            // Log the user in to start the authenticated session
-            Auth::login($user);
-
-            // Prevent Session Fixation attacks
-            $request->session()->regenerate();
-
-            // Return JSON response
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'message' => 'User logged in successfully.',
-                    'user_data' => $user
-                ], 200);
-            }
-
-            // Redirect to intended destination
-            return redirect()
-                ->intended(route('tasks.index'))
-                ->with('success', 'User logged in successfully.');
-        }
-
-        // // Tip: Easy way to login as all process thats done above is done automatically by Auth::attempt
-        // if (Auth::attempt($credentials)) {
-        //     $request->session()->regenerate();
-
-        //     return redirect()
-        //         ->intended(route('tasks.index'))
-        //         ->with('status', 'User logged in successfully.');
-        // }
-
-        // Return back if credentials fail
-        return back()->withErrors([
-            'email' => 'Invalid login credentials.',
-        ])->onlyInput('email');     // allows form to repopulate the email field
+        return redirect()
+            ->intended(route('tasks.index'))
+            ->with('success', 'User logged in successfully.');
     }
 
     // POST: Logout User

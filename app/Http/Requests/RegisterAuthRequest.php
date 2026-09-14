@@ -29,12 +29,4 @@ class RegisterAuthRequest extends FormRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
-
-    #[Override]
-    public function messages(): array
-    {
-        return [
-
-        ];
-    }
 }

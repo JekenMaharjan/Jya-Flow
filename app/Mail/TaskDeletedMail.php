@@ -33,7 +33,7 @@ class TaskDeletedMail extends Mailable implements ShouldQueue
         $title = $this->task['title'] ?? 'Task';
 
         return new Envelope(
-            subject: "Task - '$title' has been deleted.",
+            subject: "Task Deleted : '$title'.",
         );
     }
 
