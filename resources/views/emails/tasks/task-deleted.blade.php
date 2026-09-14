@@ -180,7 +180,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="footer">
+        <div class="footer italic">
             Streamline your workflow, amplify your results.
         </div>
     </div>

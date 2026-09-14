@@ -70,33 +70,6 @@
         margin-bottom: 16px;
     }
 
-    .task-detail {
-        border-top: 1px solid #e5e7eb; 
-        padding-top: 12px; 
-        font-size: 14px; 
-        color: #6b7280;
-    }
-
-    .task-priority {
-        display: inline-block; 
-        padding: 2px 8px; 
-        background-color: #e0e7ff; 
-        color: #3730a3; 
-        border-radius: 9999px; 
-        font-weight: 600; 
-        font-size: 12px;
-    }
-
-    .task-due {
-        display: inline-block; 
-        padding: 2px 8px; 
-        background-color: #d1fae5; 
-        color: #065f46; 
-        border-radius: 9999px; 
-        font-weight: 600; 
-        font-size: 12px;
-    }
-
     .task-detail p {
         margin: 4px 0;
     }
@@ -117,6 +90,7 @@
         border-top: 1px solid #e5e7eb; 
         font-size: 12px; 
         color: #9ca3af;
+        font-style: italic;
     }
 </style>
 
@@ -126,58 +100,38 @@
         <!-- Header -->
         <div class="header">
             <h1 class="header-title">
-                Hello, {{ $task->user->name }}!
+                Hello, {{ $user->name }}!
             </h1>
         </div>
 
         <!-- Body Content -->
         <div class="body">
             <p class="body-title">
-                This is a quick reminder that the task - "{{ ($task->title) }}" is due on {{ $task->due_at_nepal->format('Y-m-d \a\t h:i A') ?? 'No due date' }}. Here are the details:
+                Welcome to {{ config('app.name') }}, {{ $user->name }}!
             </p>
 
             <!-- Task Card -->
             <div class="task-card">
                 <h2 class="task-title">
-                    {{ $task->title }}
+                    Thanks for creating an account with us. We're excited to have you on board!
                 </h2>
                 
-                @if($task->description)
-                    <p class="task-description">
-                        {{ $task->description }}
-                    </p>
-                @endif
-
-                <div class="task-detail">
-                    <p>
-                        <strong>Priority:</strong> 
-
-                        <span class="task-priority">
-                            {{ ucfirst($task->priority->value ?? $task->priority) }}
-                        </span>
-                    </p>
-
-                    <p>
-                        <strong>Due at:</strong> 
-                        
-                        <span class="task-due">
-                            {{ $task->due_at_nepal->format('Y-m-d \a\t h:i A') ?? 'No due date' }}
-                        </span>
-                    </p>
-                </div>
+                <p class="task-description">
+                    You made it! Say goodbye to scattered sticky notes and missed deadlines. Your account is live, and your fresh start begins today.
+                </p>
             </div>
 
             <!-- Call to Action Button -->
             <div class="btn-div">
-                <a href="{{ url('/tasks/' . $task->id) }}" class="btn">
-                    View Your Task
+                <a href="{{ route('login') }}" class="btn">
+                    Log In to Your Workspace
                 </a>
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="footer italic">
-            Deadlines aren't just dates—they're our commitment to progress.
+        <div class="footer">
+            Set up your workspace. Conquer your tasks list.
         </div>
     </div>
 </div>
