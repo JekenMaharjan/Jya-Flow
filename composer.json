@@ -17,6 +17,8 @@
         "codeat3/blade-fluentui-system-icons": "^1.35",
         "codeat3/blade-phosphor-icons": "^2.4",
         "codeat3/blade-simple-icons": "^8.12",
+        "firebase/php-jwt": "^7.1",
+        "kreait/laravel-firebase": "^7.2",
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
