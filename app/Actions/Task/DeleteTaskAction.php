@@ -2,6 +2,7 @@
 
 namespace App\Actions\Task;
 
+use App\Events\TaskDeleted;
 use App\Mail\TaskDeletedMail;
 use App\Models\Task;
 use Illuminate\Support\Facades\Mail;
@@ -33,7 +34,6 @@ class DeleteTaskAction
         // Delete record from database
         $task->delete();
 
-        // Dispatch the queue mail with the plain array
-        Mail::to($userEmail)->queue(new TaskDeletedMail($taskData));
+        TaskDeleted::dispatch($taskData, $userEmail);
     }
 }
