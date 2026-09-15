@@ -117,6 +117,7 @@
         border-top: 1px solid #e5e7eb; 
         font-size: 12px; 
         color: #9ca3af;
+        font-style: italic;
     }
 </style>
 

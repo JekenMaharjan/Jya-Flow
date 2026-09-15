@@ -2,6 +2,7 @@
 
 namespace App\Actions\Auth;
 
+use App\Events\UserRegistered;
 use App\Mail\WelcomeMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,8 @@ class RegisterUserAction
             'password' => Hash::make($data['password']),
         ]);
 
-        Mail::to($user)->queue(new WelcomeMail($user));
+        // Dispatch the event
+        UserRegistered::dispatch($user);
 
         return $user;
     }
