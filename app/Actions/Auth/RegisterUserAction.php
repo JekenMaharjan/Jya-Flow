@@ -3,10 +3,8 @@
 namespace App\Actions\Auth;
 
 use App\Events\UserRegistered;
-use App\Mail\WelcomeMail;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class RegisterUserAction

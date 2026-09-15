@@ -2,6 +2,7 @@
 
 namespace App\Actions\Task;
 
+use App\Events\TaskCreated;
 use App\Mail\TaskCreatedMail;
 use App\Models\Task;
 use App\Models\User;
@@ -31,10 +32,9 @@ class CreateTaskAction
 
         // Create task owned by the authenticated user
         $task = $user->tasks()->create($data);
-        $userEmail = $task->user->email;
+        // $userEmail = $task->user->email;
 
-        // Queue confimation email
-        Mail::to($userEmail)->queue(new TaskCreatedMail($task));
+        TaskCreated::dispatch($task);
 
         return $task;
     }
