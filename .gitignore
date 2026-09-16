@@ -28,6 +28,6 @@ Thumbs.db
 /database/*.sqlite
 
 
-/storage/app/firebase
+storage/app/firebase/
 
 .vscode/

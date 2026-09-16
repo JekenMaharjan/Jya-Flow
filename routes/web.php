@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FileUploadController;
+use App\Http\Controllers\FirebaseConnectionController;
 use App\Http\Controllers\FirebaseController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
@@ -18,7 +19,8 @@ Route::controller(UserController::class)->group(function () {
 });
 
 // Testing firebase
-Route::get('/firebase-test', [FirebaseController::class, 'test']);
+// Route::get('/firebase-test', [FirebaseController::class, 'test']);
+Route::get('/firebase-test', [FirebaseConnectionController::class, 'index']);
 
 // Guest Routes (Only accessible when NOT logged in)
 Route::middleware('guest')->controller(AuthController::class)->group(function () {

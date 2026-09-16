@@ -15,7 +15,7 @@ class FirebaseService
     {
         $factory = (new Factory)
             //Path to service account file
-            ->withServiceAccount(storage_path('app/firebase/firebase_credentials.json'))
+            ->withServiceAccount(storage_path('storage/app/firebase/firebase_credentials.json'))
             //Change This to firebase realtime database path
             ->withDatabaseUri('https://jya-flow-default-rtdb.firebaseio.com/');
 
