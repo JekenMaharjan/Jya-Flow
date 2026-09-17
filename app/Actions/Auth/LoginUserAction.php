@@ -4,7 +4,6 @@ namespace App\Actions\Auth;
 
 use App\Models\User;
 use Exception;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Kreait\Laravel\Firebase\Facades\Firebase;
 use Lorisleiva\Actions\Concerns\AsAction;

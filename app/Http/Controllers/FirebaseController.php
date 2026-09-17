@@ -1,9 +1,10 @@
 <?php
 
+// Realtime Database : Verifies that custom FirebaseService wrapper works properly within Laravel's Service Container by writing to a 'testing' node
+
 namespace App\Http\Controllers;
 
 use App\Services\FirebaseService;
-use Illuminate\Http\Request;
 
 class FirebaseController extends Controller
 {
@@ -16,6 +17,7 @@ class FirebaseController extends Controller
 
     public function test()
     {
+        // Creates a reference to a node named 'testing' in Firebase Realtime Database
         $this->firebase->getReference("testing")
             ->set([
                 'message' => 'Firebase Integration Successful!'

@@ -3,13 +3,10 @@
 namespace App\Actions\Task;
 
 use App\Events\TaskCreated;
-use App\Mail\TaskCreatedMail;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Kreait\Firebase\Contract\Firestore;
-use Kreait\Laravel\Firebase\Facades\Firebase;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateTaskAction
@@ -36,6 +33,7 @@ class CreateTaskAction
             $uploadedFiles[] = $file->store('uploads', 'public');
         }
 
+        // Set uploaded files into filename
         $data['filename'] = $uploadedFiles;
 
         // Save task to local SQLite db via Eloquent

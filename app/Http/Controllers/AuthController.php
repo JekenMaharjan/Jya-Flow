@@ -14,16 +14,16 @@ class AuthController extends Controller
 {
     public function __construct(protected FirebaseAuth $firebaseAuth)
     {
-
+        //
     }
 
-    // GET: Show register page
+    // GET: Register page
     public function showRegister()
     {
         return view('auth.register');  
     }
 
-    // GET: Show login page
+    // GET: Login page
     public function showLogin()
     {
         return view('auth.login');

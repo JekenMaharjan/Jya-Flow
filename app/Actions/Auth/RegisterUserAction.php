@@ -13,10 +13,11 @@ class RegisterUserAction
 {
     use AsAction;
 
-    // Best Practice: Inject the Contract via Constructor
-    public function __construct(
-        protected FirebaseAuth $firebaseAuth
-    ) {}
+    // Inject the Contract via Constructor
+    public function __construct(protected FirebaseAuth $firebaseAuth)
+    {
+        //
+    }
 
     public function handle(array $data): User
     {

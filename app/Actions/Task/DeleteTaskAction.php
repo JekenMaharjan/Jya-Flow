@@ -3,15 +3,21 @@
 namespace App\Actions\Task;
 
 use App\Events\TaskDeleted;
-use App\Mail\TaskDeletedMail;
 use App\Models\Task;
-use Illuminate\Support\Facades\Mail;
+use Exception;
 use Illuminate\Support\Facades\Storage;
+use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Throwable;
 
 class DeleteTaskAction
 {
     use AsAction;
+
+    public function __construct(protected ContractFirestore $firestore)
+    {
+        //
+    }
 
     public function handle(Task $task): void
     {
@@ -25,6 +31,18 @@ class DeleteTaskAction
                     Storage::disk('public')->delete($file);
                 }
             }
+        }
+
+        // Delete task document from Firestore (Real-time sync)
+        try {
+            $database = $this->firestore->database();
+
+            $documentId = (string) $task->id;
+
+            $database->collection('tasks')->document($documentId)->delete();
+        } catch (Throwable $e) {
+            // Log error so local db deletion proceeds if Firestore fails
+            logger()->error("Failed to delete task from Firestore: " . $e->getMessage());
         }
 
         // Capture task attributes as an array BEFORE deletion for queued mail
