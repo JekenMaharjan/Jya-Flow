@@ -5,11 +5,17 @@ namespace App\Actions\Task;
 use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class UpdateTaskAction
 {
     use AsAction;
+
+    public function __construct(protected ContractFirestore $firestore)
+    {
+        //
+    }
 
     public function handle(Task $task, array $data, array $files = []): Task
     {
@@ -49,6 +55,23 @@ class UpdateTaskAction
 
         // Save updates to database
         $task->save();
+
+        // Update task document to Firestore
+        $this->firestore->database()
+            ->collection('tasks')
+            ->document((string) $task->id)
+            ->set([
+                'title'               => $task->title,
+                'description'         => $task->description,
+                'filename'            => $task->filename,
+                'priority'            => $task->priority?->value ?? $task->priority,
+                'status'              => $task->status?->value ?? $task->status,
+                'due_at'              => $task->due_at?->toIso8601String(),
+                'collaborator_email'  => $task->collaborator_email,
+                'last_updated_by'     => $task->last_updated_by,
+                'updated_at'          => now()->toIso8601String(),
+                'due_soon_alert_sent' => $task->due_soon_alert_sent,
+            ], ['merge' => true]);
 
         return $task;
     }

@@ -6,7 +6,7 @@ use App\Events\TaskCreated;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
-use Kreait\Firebase\Contract\Firestore;
+use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateTaskAction
@@ -14,7 +14,7 @@ class CreateTaskAction
     use AsAction;
 
     // Inject Firestore Contract following dependency injection
-    public function __construct(protected Firestore $firestore)
+    public function __construct(protected ContractFirestore $firestore)
     {
         //
     }

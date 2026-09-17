@@ -43,9 +43,9 @@ class DatabaseSeeder extends Seeder
             'user_id' => $user->id,
         ]);
 
-        // Generates 10 users, and automatically creates 3 tasks for EACH user
-        User::factory(10)
-            ->has(Task::factory()->count(3))
-            ->create();
+        // // Generates 10 users, and automatically creates 3 tasks for EACH user
+        // User::factory(10)
+        //     ->has(Task::factory()->count(3))
+        //     ->create();
     }
 }

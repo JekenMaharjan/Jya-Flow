@@ -4,7 +4,6 @@ namespace App\Actions\Task;
 
 use App\Events\TaskDeleted;
 use App\Models\Task;
-use Exception;
 use Illuminate\Support\Facades\Storage;
 use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 use Lorisleiva\Actions\Concerns\AsAction;

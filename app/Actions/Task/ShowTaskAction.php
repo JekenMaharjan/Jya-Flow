@@ -5,14 +5,52 @@ namespace App\Actions\Task;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Models\User;
+use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Throwable;
 
 class ShowTaskAction
 {
     use AsAction;
 
+    public function __construct(protected ContractFirestore $firestore)
+    {
+        //
+    }
+
     public function handle(User $user, array $filters = []): array
     {
+        $database = $this->firestore->database();
+        $allFirestoreTasks = [];
+
+        try {
+            // Fetch tasks owned by the user
+            $ownedDocuments = $database->collection('tasks')
+                ->where('user_id', '=', $user->id)
+                ->documents();
+
+            foreach ($ownedDocuments as $doc) {
+                if ($doc->exists()) {
+                    $allFirestoreTasks[$doc->id()] = array_merge(['id' => $doc->id()], $doc->data());
+                }
+            }
+
+            // Fetch tasks where the user is a collaborator
+            if (! empty($user->email)) {
+                $collaboratedDocuments = $database->collection('tasks')
+                    ->where('collaborator_email', '=', $user->email)
+                    ->documents();
+
+                foreach ($collaboratedDocuments as $doc) {
+                    if ($doc->exists()) {
+                        $allFirestoreTasks[$doc->id()] = array_merge(['id' => $doc->id()], $doc->data());
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            logger()->error("Failed to fetch tasks from Firestore: " . $e->getMessage());
+        }
+
         // Calculate counts using SQL dierectly owned by authenticated user
         $counts = [
             'total'       => $user->tasks()->count(),
@@ -41,9 +79,29 @@ class ShowTaskAction
         // Fetch paginated tasks and append query parameters
         $tasks = $query->latest()->paginate(5)->withQueryString();
 
+        // // Fetch specific user tasks documents from Firebase (Real-time sync)
+        // $firestoreTasks = [];
+
+        // try {
+        //     $documents = $this->firestore->database()
+        //         ->collection('tasks')
+        //         ->where('collaborator_email', 'array-contains', $user->firebase_uid)
+        //         ->documents();
+
+        //     foreach ($documents as $document) {
+        //         if ($document->exists()) {
+        //             $firestoreTasks[] = array_merge(['id' => $document->id(), $document->data()]);
+        //         }
+        //     }
+        // } catch (Throwable $e) {
+        //     logger()->error("Failed to fetch tasks from Firebase" . $e->getMessage());
+        // }
+
         return [
             'tasks' => $tasks,
             'counts' => $counts,
+            // 'tasks' => $firestoreTasks,
+            // 'counts' => count($firestoreTasks),
         ];
     }
 }

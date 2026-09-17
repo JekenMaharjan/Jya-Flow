@@ -34,7 +34,7 @@ class TaskController extends Controller
     // GET: Retrieve all tasks with filter tasks
     public function index(Request $request)
     {
-        // Run action to retrieve taskgis with filters
+        // Run action to retrieve tasks with filters
         $result = ShowTaskAction::run(
             user: $request->user(),
             filters: $request->only(['status', 'priority'])
