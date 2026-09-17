@@ -8,11 +8,19 @@ use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Kreait\Firebase\Contract\Firestore;
+use Kreait\Laravel\Firebase\Facades\Firebase;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class CreateTaskAction
 {
     use AsAction;
+
+    // Inject Firestore Contract following dependency injection
+    public function __construct(protected Firestore $firestore)
+    {
+        //
+    }
 
     public function handle(User $user, array $data, array $files = []): Task
     {
@@ -22,7 +30,7 @@ class CreateTaskAction
             ->setTimezone('UTC');
         }
 
-        // Process mutiple file uploads
+        // Process multiple file uploads
         $uploadedFiles = [];
         foreach ($files as $file) {
             $uploadedFiles[] = $file->store('uploads', 'public');
@@ -30,10 +38,29 @@ class CreateTaskAction
 
         $data['filename'] = $uploadedFiles;
 
-        // Create task owned by the authenticated user
+        // Save task to local SQLite db via Eloquent
         $task = $user->tasks()->create($data);
-        // $userEmail = $task->user->email;
 
+        // Save task document to Firestore
+        $database = $this->firestore->database();
+
+        $database->collection('tasks')->document((string) $task->id)->set([
+            'id' => $task->id,
+            'user_id' => $user->id,
+            'user_email' => $user->email,
+            'title' => $data['title'] ?? null,
+            'description' => $data['description'] ?? null,
+            'filename' => $data['filename'] ?? null,
+            'priority' => $data['priority'] ?? 'low',
+            'status' => $data['status'] ?? 'in_progress',
+            'due_at' => isset($data['due_at']) ? $data['due_at']->toIso8601String() : null,
+            'collaborator_email' => $data['collaborator_email'] ?? null,
+            'last_updated_by' => $data['last_updated_by'] ?? null,
+            'created_at' => now()->toIso8601String(),
+            'due_soon_alert_sent' => $data['due_soon_alert_sent'] ?? null,
+        ]);
+
+        // Dispatch Event
         TaskCreated::dispatch($task);
 
         return $task;

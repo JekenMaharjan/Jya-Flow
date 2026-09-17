@@ -6,46 +6,41 @@ use App\Events\UserRegistered;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Hash;
-use Kreait\Laravel\Firebase\Facades\Firebase;
+use Kreait\Firebase\Contract\Auth as FirebaseAuth;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class RegisterUserAction
 {
     use AsAction;
 
-    public function __construct()
-    {
-        $path = storage_path('app/firebase/firebase_credentials.json');
-
-        if (!file_exists($path)) {
-            throw new Exception("Firebase credentials file missing at: {$path}");
-        }
-    }
+    // Best Practice: Inject the Contract via Constructor
+    public function __construct(
+        protected FirebaseAuth $firebaseAuth
+    ) {}
 
     public function handle(array $data): User
     {
-        // Register user in firebase
-        $firebaseUser = Firebase::auth()->createUser([
-            'displayName' => $data['name'],  // Firebase uses 'displayName' for name
-            'email' => $data['email'],
-            'password' => $data['password'],  // Pass plain test as firebase uses own secure password hashing called 'Scrypt' on its servers
+        // Create in Firebase
+        $firebaseUser = $this->firebaseAuth->createUser([
+            'displayName' => $data['name'],
+            'email'       => $data['email'],
+            'password'    => $data['password'],
         ]);
 
         try {
-            // Register user in local database
+            // Persist in Local Database
             $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
+                'name'         => $data['name'],
+                'email'        => $data['email'],
+                'password'     => Hash::make($data['password']),
                 'firebase_uid' => $firebaseUser->uid,
             ]);
         } catch (Exception $e) {
-            // Rollback: Delete user from Firebase if local DB fails
-            Firebase::auth()->deleteUser($firebaseUser->uid);
+            // Rollback Firebase user if local creation fails
+            $this->firebaseAuth->deleteUser($firebaseUser->uid);
             throw $e;
         }
 
-        // Dispatch post-registration event
         UserRegistered::dispatch($user);
 
         return $user;

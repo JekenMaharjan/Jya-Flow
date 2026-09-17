@@ -40,7 +40,7 @@ class TaskController extends Controller
             filters: $request->only(['status', 'priority'])
         );
 
-        return view('tasks', [
+        return view('roles.member.member_task', [
             'tasks'                 => $result['tasks'],
             'totalTasksCount'       => $result['counts']['total'],
             'inProgressTasksCount'  => $result['counts']['in_progress'],

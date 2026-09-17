@@ -70,6 +70,8 @@ return [
 
             'firestore' => [
 
+                'transport' => 'rest', // Forces HTTP/REST instead of gRPC
+
                 /*
                  * If you want to access a Firestore database other than the default database,
                  * enter its name here.

@@ -6,11 +6,17 @@ use App\Actions\Auth\LoginUserAction;
 use App\Actions\Auth\RegisterUserAction;
 use App\Http\Requests\LoginAuthRequest;
 use App\Http\Requests\RegisterAuthRequest;
+use Kreait\Firebase\Contract\Auth as FirebaseAuth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    public function __construct(protected FirebaseAuth $firebaseAuth)
+    {
+
+    }
+
     // GET: Show register page
     public function showRegister()
     {
@@ -52,7 +58,21 @@ class AuthController extends Controller
     // POST: User logout
     public function logout(Request $request)
     {
+        $user = Auth::user();
+
+        if ($user && $user->firebase_uid) {
+            try {
+                $this->firebaseAuth->revokeRefreshTokens($user->firebase_uid);
+            } catch (\Throwable $e) {
+                logger()->error("Failed to revoke Firebase tokens: " . $e->getMessage());
+            }
+        }
+
         Auth::logout();
+
+        if ($user && $user->firebase_uid) {
+            $this->firebaseAuth->revokeRefreshTokens($user->firebase_uid);
+        }
 
         // Invalidate web session & regenerate CSRF token
         $request->session()->invalidate();
