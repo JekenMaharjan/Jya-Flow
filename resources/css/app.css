@@ -13,3 +13,7 @@
     --font-pinyon: 'Pinyon Script', sans-serif;
     --font-monoton: 'Monoton', sans-serif;
 }
+
+[x-cloak] {
+    display: none !important;
+}

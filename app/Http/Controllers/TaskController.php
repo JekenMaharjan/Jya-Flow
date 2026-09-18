@@ -84,24 +84,24 @@ class TaskController extends Controller
         return back()->with('success', 'Task updated successfully!');
     }
 
-    // PATCH: Update Task
-    public function update(Task $task)
-    {
-        if ($task['status'] === TaskStatus::COMPLETED) {
-            return back()->with('info', 'Status is completed, action skipped.');
-        }
+    // // PATCH: Update Task
+    // public function update(Task $task)
+    // {
+    //     if ($task['status'] === TaskStatus::COMPLETED) {
+    //         return back()->with('info', 'Status is completed, action skipped.');
+    //     }
 
-        // Eloquent only updates the 'status' column in the database
-        $task->update(['status' => TaskStatus::COMPLETED]);
+    //     // Eloquent only updates the 'status' column in the database
+    //     $task->update(['status' => TaskStatus::COMPLETED]);
         
-        return back()->with('success', "Status updated to Completed.");
-    }
+    //     return back()->with('success', "Status updated to Completed.");
+    // }
 
-    // DELETE: Delete Task
-    public function destroy(Task $task)
-    {
-        DeleteTaskAction::run($task);
+    // // DELETE: Delete Task
+    // public function destroy(Task $task)
+    // {
+    //     DeleteTaskAction::run($task);
 
-        return back()->with('success', 'Task deleted successfully.');
-    }
+    //     return back()->with('success', 'Task deleted successfully.');
+    // }
 }

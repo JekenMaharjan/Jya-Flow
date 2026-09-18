@@ -4,7 +4,7 @@
 @use('\App\Enums\TaskPriority')
 
 @section('content')
-    <div class="max-w-xl mx-auto my-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
+    <div class="max-w-2xl mx-auto my-6 p-6 sm:p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md shadow-2xl shadow-black/50">
 
         <!-- Header with Task Stats -->
         <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
@@ -76,10 +76,10 @@
 
         <hr class="text-white/10 my-4">
 
-        <!-- Add task button -->
+        <!-- Add Task Button -->
         <button 
             type="button"
-            onclick="document.getElementById('taskModal').showModal()"
+            @click="$dispatch('open-modal', 'add-task-modal')"
             class="py-2 px-4 mb-7 rounded-xl text-sm font-semibold text-white bg-indigo-600/80 hover:bg-indigo-500/90 border border-indigo-400/30 shadow-lg shadow-indigo-600/30 backdrop-blur-sm transition-all duration-200 cursor-pointer"
         >
             <span class="text-sm">+ Add Task</span>
@@ -89,8 +89,12 @@
         <ul class="space-y-3 mb-5">
             @forelse($tasks as $task)
                 <li 
+                    x-data="{ show: true }"
+                    x-show="show"
+                    x-transition.out.opacity.duration.300ms
+                    @task-deleted.window="if ($event.detail.taskId === {{ $task->id }}) show = false"
+                    @click="if (!$event.target.closest('button')) $dispatch('open-modal', 'preview-task-{{ $task->id }}')"
                     class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 bg-slate-700/10 hover:bg-slate-700/20"
-                    onclick="document.getElementById('previewTaskModal_{{ $task->id }}').showModal()"
                 >
                     <!-- First half -->
                     <div class="flex-1 flex-col items-center">
@@ -129,39 +133,7 @@
 
                     <!-- Action Buttons -->
                     <div class="flex items-center gap-2">
-                        <form action="{{ route('tasks.update', $task) }}" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button 
-                                type="submit"
-                                onclick="event.stopPropagation()"
-                                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1 border {{ (($task->status) === TaskStatus::COMPLETED) ? ('bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20') : ('bg-slate-400/10 text-slate-300 border-slate-500/20 hover:bg-slate-500/30') }}"
-                            >
-                                @if($task->status === TaskStatus::COMPLETED)
-                                    <x-entypo-check class="h-4 w-4"/>
-                                    <span>Completed</span>
-                                @else
-                                    <x-carbon-in-progress class="h-4 w-4"/>
-                                    <span>InProgress</span>
-                                @endif
-                            </button>
-                        </form>
-
-                        <!-- Delete Task -->
-                        <form action="{{ route('tasks.destroy', $task) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button 
-                                type="submit"
-                                onclick="event.stopPropagation(); return confirm('Are you sure you want to delete this task?');"
-                                class="text-xs px-3 py-1.5 rounded-lg flex gap-2 items-center font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all duration-200 cursor-pointer"
-                            >
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                                Delete
-                            </button>
-                        </form>
+                        <livewire:task-action-button :task="$task" :key="$task->id" />
                     </div>
                 </li>
 
@@ -170,7 +142,7 @@
                 
             @empty
                 <!-- Empty State -->
-                <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/[0.01]">
+                <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/1">
                     <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-800/80 border border-white/10 flex items-center justify-center">
                         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>

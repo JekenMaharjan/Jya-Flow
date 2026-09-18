@@ -17,6 +17,7 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
+        "alpinejs": "^3.17.3",
         "firebase": "^12.19.0"
     }
 }
