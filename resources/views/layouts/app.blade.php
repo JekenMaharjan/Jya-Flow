@@ -14,6 +14,8 @@
 
     <!-- Tailwind CSS & JS via Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @livewireStyles
 </head>
 
 <body class="w-full h-full font-['Inter',sans-serif] bg-slate-950 text-slate-100">
@@ -103,5 +105,6 @@
     </main>
 
     <!-- <x-toast /> -->
+    @livewireScripts
 </body>
 </html>
