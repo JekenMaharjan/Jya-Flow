@@ -104,7 +104,58 @@
         @yield('content')
     </main>
 
-    <!-- <x-toast /> -->
     @livewireScripts
+
+    {{-- Flash Message Toast --}}
+    @if (Session::has('success') || Session::has('info'))
+        <div
+            x-data="{ show: true }" 
+            x-show="show" 
+            x-init="setTimeout(() => show = false, 3000)" 
+            class="fixed bottom-5 right-5 z-50"
+        >
+            @if (Session::has('success'))
+                <div class="flex items-center gap-3 px-4 py-3 rounded-xl
+                            bg-emerald-500/10
+                            border border-emerald-500/20
+                            text-emerald-400
+                            shadow-xl shadow-black/30
+                            backdrop-blur-md">
+
+                    <span class="text-sm font-medium">
+                        {{ Session::get('success') }}
+                    </span>
+
+                    <button
+                        type="button"
+                        @click="show = false"
+                        class="text-emerald-400/70 hover:text-emerald-300 text-lg leading-none cursor-pointer"
+                    >
+                        &times;
+                    </button>
+                </div>
+            @elseif (Session::has('info'))
+                <div class="flex items-center gap-3 px-4 py-3 rounded-xl
+                            bg-slate-500/10
+                            border border-slate-500/20
+                            text-slate-300
+                            shadow-xl shadow-black/30
+                            backdrop-blur-md">
+
+                    <span class="text-sm font-medium">
+                        {{ Session::get('info') }}
+                    </span>
+
+                    <button
+                        type="button"
+                        @click="show = false"
+                        class="text-slate-400 hover:text-white text-lg leading-none cursor-pointer"
+                    >
+                        &times;
+                    </button>
+                </div>
+            @endif
+        </div>
+    @endif
 </body>
 </html>

@@ -24,28 +24,17 @@ new class extends Component
     public function deleteTask()
     {
         DeleteTaskAction::run($this->task);
-
-        // Alpine list transition handler
-        // $this->dispatch('task-deleted', taskId: $this->task->id);
-
         session()->flash('success', 'Task deleted successfully!');
     }
 };
 
 ?>
 
-<li 
-    x-data="{ show: true }"
-    x-show="show"
-    x-transition.out.opacity.duration.300ms
-    x-on:task-deleted.window="if ($event.detail.taskId === {{ $task->id }}) show = false"
-    x-on:click="if (!$event.target.closest('button')) $dispatch('open-modal', 'preview-task-{{ $task->id }}')"
-    class="group flex items-center justify-between cursor-pointer p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 bg-slate-700/10 hover:bg-slate-700/20"
->
+<li class="group flex items-center justify-between p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 bg-slate-700/10 hover:bg-slate-700/20">
     <!-- Task Details -->
     <div class="flex-1 flex-col items-center">
         <!-- Task Title -->
-        <span class="text-sm font-medium transition-all mb-2 duration-200 {{ ($task->status === \App\Enums\TaskStatus::COMPLETED) ? 'line-through text-slate-500' : 'text-slate-200' }}">
+        <span class="text-sm font-medium transition-all mb-2 duration-200 {{ ($task->status === TaskStatus::COMPLETED) ? 'line-through text-slate-500' : 'text-slate-200' }}">
             {{ $task->title }}
         </span>
 
@@ -66,7 +55,7 @@ new class extends Component
             <span class="text-slate-300 select-none">|</span>
 
             <span class="flex gap-2 items-center">
-                <x-codicon-circle-small-filled class="w-3 h-3 scale-150 {{ (($task->status) === \App\Enums\TaskStatus::COMPLETED) ? ('text-emerald-400') : ('text-yellow-400') }}"/>
+                <x-codicon-circle-small-filled class="w-3 h-3 scale-150 {{ (($task->status) === TaskStatus::COMPLETED) ? ('text-emerald-400') : ('text-yellow-400') }}"/>
                 <span class="text-[11px] uppercase text-slate-300">{{ $task->status->label() }}</span>
             </span>
         </span>
@@ -86,7 +75,7 @@ new class extends Component
                 wire:click="markCompleted"
                 wire:loading.attr="disabled"
                 wire:target="markCompleted"
-                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 border disabled:opacity-50 {{ ($task->status === \App\Enums\TaskStatus::COMPLETED) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-400/10 text-slate-300 border-slate-500/20' }}"
+                class="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center gap-1.5 border disabled:opacity-50 {{ ($task->status === TaskStatus::COMPLETED) ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-slate-400/10 text-slate-300 border-slate-500/20' }}"
             >
                 <span wire:loading.remove wire:target="markCompleted" class="flex items-center gap-1">
                     @if($task->status === TaskStatus::COMPLETED)

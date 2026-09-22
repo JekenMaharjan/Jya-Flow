@@ -28,7 +28,7 @@ class TaskController extends Controller
         );
 
         return back()
-            ->with('success', 'Task created & Notification sent successfully!');
+            ->with('success', 'Task created successfully!');
     }
 
     // GET: Retrieve all tasks with filter tasks
