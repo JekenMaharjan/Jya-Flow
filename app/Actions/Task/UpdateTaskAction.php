@@ -3,6 +3,7 @@
 namespace App\Actions\Task;
 
 use App\Models\Task;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Kreait\Firebase\Contract\Firestore as ContractFirestore;
@@ -17,7 +18,7 @@ class UpdateTaskAction
         //
     }
 
-    public function handle(Task $task, array $data, array $files = []): Task
+    public function handle(User $user, Task $task, array $data, array $files = []): Task
     {
         // Convert Nepal time (NPT) into UTC if due_at is provided
         if (! empty($data['due_at'])) {
@@ -44,6 +45,8 @@ class UpdateTaskAction
 
             $data['filename'] = $uploadedFiles;
         }
+
+        $data['last_updated_by'] = $user->email;
 
         // Fill model attributes to check dirty state before saving
         $task->fill($data);

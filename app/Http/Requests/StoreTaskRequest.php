@@ -37,6 +37,9 @@ class StoreTaskRequest extends FormRequest
             
             'priority'=> ['required', Rule::enum(TaskPriority::class)],
             'status' => ['nullable', Rule::enum(TaskStatus::class)],
+            'collaborator_email' => ['nullable', 'array'],
+            'collaborator_email.*' => ['email'],
+            'last_updated_by' => ['nullable', 'email'],
         ];
     }
 

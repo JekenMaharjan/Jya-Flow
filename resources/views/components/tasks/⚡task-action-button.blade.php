@@ -5,19 +5,35 @@ use App\Enums\TaskStatus;
 use App\Enums\TaskPriority;
 use App\Models\Task;
 use Livewire\Component;
+use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 
 new class extends Component
 {
     public Task $task;
 
-    public function markCompleted(): void
+    public function markCompleted()
     {
         if ($this->task->status === TaskStatus::COMPLETED) {
             session()->flash('info', 'Task is already marked as completed.');
             return;
         }
 
-        $this->task->update(['status' => TaskStatus::COMPLETED]);
+        // Update 'status' and 'last_updated_by' in tasks table
+        $this->task->update([
+            'status' => TaskStatus::COMPLETED,
+            'last_updated_by' => auth()->user()->email,
+        ]);
+
+        // Update into firebase Firestore 'tasks' collection
+        app(ContractFirestore::class)
+            ->database()
+            ->collection('tasks')
+            ->document((string) $this->task->id)
+            ->set([
+                'status' => $this->task->status?->value ?? $this->task->status,
+                'last_updated_by' => $this->task->last_updated_by,
+            ], ['merge' => true]);
+
         session()->flash('success', 'Task marked as completed!');
     }
 

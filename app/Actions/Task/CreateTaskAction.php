@@ -36,6 +36,11 @@ class CreateTaskAction
         // Set uploaded files into filename
         $data['filename'] = $uploadedFiles;
 
+        // Convert multiple collaborator emails into a single string
+        if (!empty($data['collaborator_email'])) {
+            $data['collaborator_email'] = implode(',', $data['collaborator_email']);
+        }
+
         // Save task to local SQLite db via Eloquent
         $task = $user->tasks()->create($data);
 

@@ -22,6 +22,8 @@ class Task extends Model
         'priority',
         'status',
         'due_soon_alert_sent',
+        'collaborator_email',
+        'last_updated_by',
     ];
     
     protected function casts(): array
@@ -45,5 +47,10 @@ class Task extends Model
     public function getDueAtNepalAttribute()  // this creates due_at_nepal automatically i.e., getDueAtNepalAttribute() -> $task->due_at_nepal  as laravel converts due_at_nepal from snake_case to StudlyCase (DueAtNepal)
     {
         return $this->due_at ? $this->due_at->setTimezone('Asia/Kathmandu') : null;
+    }
+
+    public function collaborators()
+    {
+        return $this->belongsToMany(User::class);
     }
 }

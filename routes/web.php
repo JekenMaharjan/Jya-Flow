@@ -1,9 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\FirebaseConnectionController;
-use App\Http\Controllers\FirebaseController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -37,8 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::controller(TaskController::class)->prefix('tasks')->name('tasks.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        // Route::patch('/{task}', 'update')->name('update');
-        // Route::delete('/{task}', 'destroy')->name('destroy');
         Route::get('/{task}', 'preview')->name('preview');
         Route::put('/{task}', 'change')->name('change');
     });
@@ -47,11 +43,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// File Upload Routes
-Route::controller(FileUploadController::class)->prefix('upload')->name('upload.')->group(function () {
-    Route::get('/', 'uploadUI')->name('index');
-    Route::post('/', 'store')->name('store');
-    Route::delete('/{file}', 'destroy')->name('destroy');
-    Route::put('/{file}', 'edit')->name('edit');
-});
+
 

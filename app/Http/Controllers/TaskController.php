@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Task\CreateTaskAction;
-use App\Actions\Task\DeleteTaskAction;
 use App\Actions\Task\ShowTaskAction;
 use App\Actions\Task\UpdateTaskAction;
-use App\Enums\TaskStatus;
+use App\Enums\UserRole;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -40,14 +40,19 @@ class TaskController extends Controller
             filters: $request->only(['status', 'priority'])
         );
 
-        return view('roles.member.member_task', [
-            'tasks'                 => $result['tasks'],
-            'totalTasksCount'       => $result['counts']['total'],
-            'inProgressTasksCount'  => $result['counts']['in_progress'],
-            'completedTasksCount'   => $result['counts']['completed'],
-            'lowTasksCount'         => $result['counts']['low'],
-            'mediumTasksCount'      => $result['counts']['medium'],
-            'highTasksCount'        => $result['counts']['high'],
+        $view = $request->user()->role === UserRole::ADMIN
+            ? 'roles.admin.admin_task'
+            : 'roles.member.member_task';
+
+        return view($view, [
+            'members'              => User::where('role', UserRole::MEMBER)->get(),
+            'tasks'                => $result['tasks'],
+            'totalTasksCount'      => $result['counts']['total'],
+            'inProgressTasksCount' => $result['counts']['in_progress'],
+            'completedTasksCount'  => $result['counts']['completed'],
+            'lowTasksCount'        => $result['counts']['low'],
+            'mediumTasksCount'     => $result['counts']['medium'],
+            'highTasksCount'       => $result['counts']['high'],
         ]);
     }
 
@@ -76,6 +81,7 @@ class TaskController extends Controller
         $files = $request->hasFile('files') ? $request->file('files') : [];
 
         UpdateTaskAction::run(
+            user: $request->user(),
             task: $task,
             data: $request->validated(),
             files: $files
@@ -83,25 +89,4 @@ class TaskController extends Controller
 
         return back()->with('success', 'Task updated successfully!');
     }
-
-    // // PATCH: Update Task
-    // public function update(Task $task)
-    // {
-    //     if ($task['status'] === TaskStatus::COMPLETED) {
-    //         return back()->with('info', 'Status is completed, action skipped.');
-    //     }
-
-    //     // Eloquent only updates the 'status' column in the database
-    //     $task->update(['status' => TaskStatus::COMPLETED]);
-        
-    //     return back()->with('success', "Status updated to Completed.");
-    // }
-
-    // // DELETE: Delete Task
-    // public function destroy(Task $task)
-    // {
-    //     DeleteTaskAction::run($task);
-
-    //     return back()->with('success', 'Task deleted successfully.');
-    // }
 }

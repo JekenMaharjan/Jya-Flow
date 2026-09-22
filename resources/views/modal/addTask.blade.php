@@ -75,6 +75,24 @@
             @enderror
         </div>
 
+        {{-- Collaborator Email --}}
+        <div>
+            <label for="collaborator_email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Collaborators</label>
+            <div class="flex flex-col gap-1 text-sm">
+                @foreach ($members as $member)
+                    <label class="flex gap-2 items-center text-center">
+                        <input
+                            type="checkbox"
+                            name="collaborator_email[]"
+                            value="{{ $member->email }}"
+                        >
+
+                        {{ $member->name }} ({{ $member->email }})
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex items-center justify-end gap-3 pt-4 mt-2 border-t border-white/10">
             <button 
