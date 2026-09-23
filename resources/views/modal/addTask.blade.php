@@ -79,7 +79,7 @@
         <div>
             <label for="collaborator_email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Collaborators</label>
             <div class="flex flex-col gap-1 text-sm">
-                @foreach ($members as $member)
+                @forelse ($members as $member)
                     <label class="flex gap-2 items-center text-center">
                         <input
                             type="checkbox"
@@ -89,7 +89,10 @@
 
                         {{ $member->name }} ({{ $member->email }})
                     </label>
-                @endforeach
+
+                    @empty
+                    <p class="text-sm text-slate-500">No Members Found!</p>
+                @endforelse
             </div>
         </div>
 

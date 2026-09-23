@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, onSnapshot } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,3 +21,22 @@ const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export default app;
+
+let isInitialLoad = true;
+
+// Attach real-time listener to the 'tasks' collection
+onSnapshot(collection(db, 'tasks'), (snapshot) => {
+    // Skip firing on initial page boot-up payload
+    if (isInitialLoad) {
+        isInitialLoad = false;
+        return;
+    }
+
+    // Check if there are actual document mutations
+    if (snapshot.docChanges().length > 0) {
+        // Dispatch event directly to Livewire components
+        if (window.Livewire) {
+            window.Livewire.dispatch('refresh-task-list');
+        }
+    }
+});

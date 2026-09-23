@@ -40,7 +40,11 @@ class TaskController extends Controller
             filters: $request->only(['status', 'priority'])
         );
 
-        $view = $request->user()->role === UserRole::ADMIN
+        // Check admin user - enum value directly
+        $isAdmin = $request->user()->role === UserRole::ADMIN
+            || $request->user()->role === UserRole::ADMIN->value;
+
+        $view = $isAdmin
             ? 'roles.admin.admin_task'
             : 'roles.member.member_task';
 

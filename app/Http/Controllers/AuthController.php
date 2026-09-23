@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         return redirect()
             ->route('login')
-            ->with('success', 'User created successfully! Please log in.');
+            ->with('success', 'User registered successfully! Please log in.');
     }
 
     // POST: User login

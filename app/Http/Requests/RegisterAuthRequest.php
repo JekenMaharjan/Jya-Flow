@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserRole;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Override;
 
 class RegisterAuthRequest extends FormRequest
@@ -27,6 +29,7 @@ class RegisterAuthRequest extends FormRequest
             'name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'max:255', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', Rule::enum(UserRole::class)],
         ];
     }
 }

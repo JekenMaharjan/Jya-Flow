@@ -50,6 +50,25 @@
             @enderror
         </div>
 
+        <!-- Role -->
+        <div>
+            <label for="role" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                Role
+            </label>
+            <select 
+                name="role" 
+                id="role"
+                class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-white/10 text-white text-sm focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
+            >
+                <option value="" disabled selected>Select the role</option>
+                <option value="admin">Admin</option>
+                <option value="member">Member</option>
+            </select>
+            @error('role') 
+                <p class="mt-1.5 text-xs text-red-400 font-medium">{{ $message }}</p> 
+            @enderror
+        </div>
+
         <!-- Password -->
         <div>
             <label for="password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">

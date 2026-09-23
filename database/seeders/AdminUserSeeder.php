@@ -42,15 +42,17 @@ class AdminUserSeeder extends Seeder
             $this->firebaseAuth->setCustomUserClaims($firebaseUser->uid, ['role' => $role]);
         }
 
-        // Save user locally with the real Firebase UID
-        $user = new User;
+        // Create/update the admin in SQLite
+        User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $name,
+                'password' => Hash::make($password),
+                'firebase_uid' => $firebaseUser->uid,
+                'role' => $role,
+            ]
+        );
 
-        $user->name = $name;
-        $user->email = $email;
-        $user->password = Hash::make($password);
-        $user->firebase_uid = $firebaseUser->uid;
-        $user->role = $role;
-
-        $user->save();
+        $this->command->info('Admin user created successfully.');
     }
 }

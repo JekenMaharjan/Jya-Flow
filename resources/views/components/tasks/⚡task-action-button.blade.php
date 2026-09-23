@@ -5,11 +5,24 @@ use App\Enums\TaskStatus;
 use App\Enums\TaskPriority;
 use App\Models\Task;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Kreait\Firebase\Contract\Firestore as ContractFirestore;
 
 new class extends Component
 {
     public Task $task;
+
+    // Listen for the real-time event and refresh the task status
+    #[On('refresh-task-list')]
+    public function refreshTask()
+    {
+        // It checks the database to see what changed for THIS specific task
+        $freshTask = Task::find($this->task->id);
+
+        if ($freshTask) {
+            $this->task = $freshTask; // Updates the component with new data
+        }
+    }
 
     public function markCompleted()
     {
@@ -30,8 +43,9 @@ new class extends Component
             ->collection('tasks')
             ->document((string) $this->task->id)
             ->set([
-                'status' => $this->task->status?->value ?? $this->task->status,
+                'status' => TaskStatus::COMPLETED->value,
                 'last_updated_by' => $this->task->last_updated_by,
+                'updated_at' => now()->timestamp,
             ], ['merge' => true]);
 
         session()->flash('success', 'Task marked as completed!');
@@ -39,12 +53,22 @@ new class extends Component
 
     public function deleteTask()
     {
+        $taskId = (string) $this->task->id;
+
         DeleteTaskAction::run($this->task);
+
+        app(ContractFirestore::class)
+            ->database()
+            ->collection('tasks')
+            ->document($taskId)
+            ->delete();
+
         session()->flash('success', 'Task deleted successfully!');
     }
 };
 
 ?>
+
 
 <li class="group flex items-center justify-between p-3.5 rounded-xl border border-white/5 hover:border-white/10 transition-all duration-200 bg-slate-700/10 hover:bg-slate-700/20">
     <!-- Task Details -->

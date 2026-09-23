@@ -28,6 +28,12 @@ class RegisterUserAction
             'password'    => $data['password'],
         ]);
 
+        // Set role in Firebase Custom User Claims
+        $this->firebaseAuth->setCustomUserClaims(
+            $firebaseUser->uid,
+            ['role' => $data['role']]
+        );
+
         try {
             // Persist in Local Database
             $user = User::create([
@@ -35,6 +41,7 @@ class RegisterUserAction
                 'email'        => $data['email'],
                 'password'     => Hash::make($data['password']),
                 'firebase_uid' => $firebaseUser->uid,
+                'role'         => $data['role'],
             ]);
         } catch (Exception $e) {
             // Rollback Firebase user if local creation fails
