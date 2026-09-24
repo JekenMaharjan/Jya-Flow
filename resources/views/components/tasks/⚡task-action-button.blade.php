@@ -34,7 +34,7 @@ new class extends Component
         // Update 'status' and 'last_updated_by' in tasks table
         $this->task->update([
             'status' => TaskStatus::COMPLETED,
-            'last_updated_by' => auth()->user()->email,
+            'last_updated_by' => auth()->user()?->email,
         ]);
 
         // Update into firebase Firestore 'tasks' collection
@@ -43,25 +43,25 @@ new class extends Component
             ->collection('tasks')
             ->document((string) $this->task->id)
             ->set([
-                'status' => TaskStatus::COMPLETED->value,
+                'title' => $this->task->title,
+                'priority' => $this->task->priority->value,
+                'status' => $this->task->status->value,
                 'last_updated_by' => $this->task->last_updated_by,
                 'updated_at' => now()->timestamp,
             ], ['merge' => true]);
+
+        // Dispatch Livewire event locally
+        $this->dispatch('refresh-task-list');
 
         session()->flash('success', 'Task marked as completed!');
     }
 
     public function deleteTask()
     {
-        $taskId = (string) $this->task->id;
-
+        // Delete from SQLite
         DeleteTaskAction::run($this->task);
 
-        app(ContractFirestore::class)
-            ->database()
-            ->collection('tasks')
-            ->document($taskId)
-            ->delete();
+        $this->dispatch('refresh-task-list');
 
         session()->flash('success', 'Task deleted successfully!');
     }
@@ -96,7 +96,7 @@ new class extends Component
 
             <span class="flex gap-2 items-center">
                 <x-codicon-circle-small-filled class="w-3 h-3 scale-150 {{ (($task->status) === TaskStatus::COMPLETED) ? ('text-emerald-400') : ('text-yellow-400') }}"/>
-                <span class="text-[11px] uppercase text-slate-300">{{ $task->status->label() }}</span>
+                <span class="text-[11px] uppercase text-slate-300">{{ $task?->status?->label() ?? 'Pending' }}</span>
             </span>
         </span>
 
@@ -119,10 +119,10 @@ new class extends Component
             >
                 <span wire:loading.remove wire:target="markCompleted" class="flex items-center gap-1">
                     @if($task->status === TaskStatus::COMPLETED)
-                        <x-entypo-check class="h-4 w-4 shrink-0"/>
+                        <x-entypo-check class="h-3.5 w-3.5 shrink-0"/>
                         <span>Completed</span>
                     @else
-                        <x-carbon-in-progress class="h-4 w-4 shrink-0"/>
+                        <x-carbon-in-progress class="h-3.5 w-3.5 shrink-0"/>
                         <span>In Progress</span>
                     @endif
                 </span>
@@ -135,12 +135,16 @@ new class extends Component
                 x-on:click="$dispatch('open-modal', 'preview-task-{{ $task->id }}')"
                 class="text-xs px-3 py-1.5 rounded-lg font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all duration-200 cursor-pointer flex items-center gap-1.5"
             >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-                <span>Edit</span>
+                <span class="flex items-center gap-1.5">
+                    <x-css-eye class="w-3.5 h-3.5"/>
+                    <span>Edit</span>
+                </span>
             </button>
+
+            <!-- Teleport the Edit Modal out of the child component to the <body> -->
+            <template x-teleport="body">
+                @include('modal.previewTask', ['task' => $task])
+            </template>
 
             <!-- Delete Button -->
             <button 
@@ -152,9 +156,7 @@ new class extends Component
                 class="text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
                 <span wire:loading.remove wire:target="deleteTask" class="flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
+                    <x-monoicon-delete class="w-3.5 h-3.5"/>
                     <span>Delete</span>
                 </span>
                 <span wire:loading wire:target="deleteTask">Deleting...</span>

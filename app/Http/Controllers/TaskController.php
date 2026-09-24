@@ -27,8 +27,7 @@ class TaskController extends Controller
             files: $files
         );
 
-        return back()
-            ->with('success', 'Task created successfully!');
+        return back()->with('success', 'Task created successfully!');
     }
 
     // GET: Retrieve all tasks with filter tasks

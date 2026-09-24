@@ -15,10 +15,12 @@
         "codeat3/blade-codicons": "^1.35",
         "codeat3/blade-file-icons": "^1.11",
         "codeat3/blade-fluentui-system-icons": "^1.35",
+        "codeat3/blade-mono-icons": "^1.6",
         "codeat3/blade-phosphor-icons": "^2.4",
         "codeat3/blade-simple-icons": "^8.12",
         "firebase/php-jwt": "^7.1",
         "google/cloud-firestore": "^2.3",
+        "khatabwedaa/blade-css-icons": "^1.6",
         "kreait/laravel-firebase": "^7.2",
         "laravel/framework": "^13.17",
         "laravel/sanctum": "^4.0",
@@ -92,6 +94,11 @@
         }
     },
     "config": {
+        "platform-suppress-unrecoverable-errors": true,
+        "platform": {
+            "ext-grpc": "1.0.0"
+        },
+
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,

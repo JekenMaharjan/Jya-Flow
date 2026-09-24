@@ -1,5 +1,6 @@
-<x-modal name="preview-task-{{ $task->id }}" title="Task Details" class="right-0 top-0">
-    <form action="{{ route('tasks.change', $task) }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 w-full">
+@if (isset($task) && $task)
+<x-modal name="preview-task-{{ $task->id }}" title="Task Details">
+    <form action="{{ route('tasks.change', $task?->id ?? 0) }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 w-full">
         @csrf
         @method('PUT')
 
@@ -139,3 +140,4 @@
         </div>
     </form>
 </x-modal>
+@endif

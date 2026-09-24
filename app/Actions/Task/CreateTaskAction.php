@@ -23,8 +23,7 @@ class CreateTaskAction
     {
         // Convert Nepal time (NPT) into UTC if due_at is provided
         if (! empty($data['due_at'])) {
-            $data['due_at'] = Carbon::parse($data['due_at'], 'Asia/Kathmandu')
-            ->setTimezone('UTC');
+            $data['due_at'] = Carbon::parse($data['due_at'], 'Asia/Kathmandu')->setTimezone('UTC');
         }
 
         // Process multiple file uploads
@@ -32,35 +31,32 @@ class CreateTaskAction
         foreach ($files as $file) {
             $uploadedFiles[] = $file->store('uploads', 'public');
         }
-
-        // Set uploaded files into filename
         $data['filename'] = $uploadedFiles;
 
-        // Convert multiple collaborator emails into a single string
-        if (!empty($data['collaborator_email'])) {
-            $data['collaborator_email'] = implode(',', $data['collaborator_email']);
+        // Format collaborator_email string consistently
+        if (!empty($data['collaborator_email']) && is_array($data['collaborator_email'])) {
+            $data['collaborator_email'] = implode(',', array_filter($data['collaborator_email']));
         }
 
-        // Save task to local SQLite db via Eloquent
+        // Create SQLit Eloquent Task
         $task = $user->tasks()->create($data);
 
-        // Save task document to Firestore
-        $database = $this->firestore->database();
-
-        $database->collection('tasks')->document((string) $task->id)->set([
-            'id' => $task->id,
-            'user_id' => $user->id,
-            'user_email' => $user->email,
-            'title' => $data['title'] ?? null,
-            'description' => $data['description'] ?? null,
-            'filename' => $data['filename'] ?? null,
-            'priority' => $data['priority'] ?? 'low',
-            'status' => $data['status'] ?? 'in_progress',
-            'due_at' => isset($data['due_at']) ? $data['due_at']->toIso8601String() : null,
-            'collaborator_email' => $data['collaborator_email'] ?? null,
-            'last_updated_by' => $data['last_updated_by'] ?? null,
-            'created_at' => now()->toIso8601String(),
-            'due_soon_alert_sent' => $data['due_soon_alert_sent'] ?? null,
+        // Sync to Firestore (Triggers real-time sync for other users)
+        $this->firestore->database()->collection('tasks')->document((string) $task->id)->set([
+            'id'                    => $task->id,
+            'user_id'               => $user->id,
+            'user_email'            => $user->email,
+            'title'                 => $task->title,
+            'description'           => $task->description,
+            'filename'              => $task->filename,
+            'priority'              => $task->priority?->value ?? $task->priority,
+            'status'                => $task->status?->value ?? $task->status,
+            'due_at'                => $task->due_at?->toIso8601String(),
+            'collaborator_email'    => $task->collaborator_email,
+            'last_updated_by'       => $user->email,
+            'created_at'            => now()->toIso8601String(),
+            'updated_at'            => now()->toIso8601String(),
+            'due_soon_alert_sent'   => false,
         ]);
 
         // Dispatch Event

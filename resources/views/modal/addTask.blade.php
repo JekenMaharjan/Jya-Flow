@@ -78,7 +78,7 @@
         {{-- Collaborator Email --}}
         <div>
             <label for="collaborator_email" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Collaborators</label>
-            <div class="flex flex-col gap-1 text-sm">
+            <div class="grid grid-cols-2 gap-1 text-sm">
                 @forelse ($members as $member)
                     <label class="flex gap-2 items-center text-center">
                         <input
