@@ -23,6 +23,7 @@
         "khatabwedaa/blade-css-icons": "^1.6",
         "kreait/laravel-firebase": "^7.2",
         "laravel/framework": "^13.17",
+        "laravel/reverb": "^1.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.4",
