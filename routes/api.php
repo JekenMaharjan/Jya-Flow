@@ -1,26 +1,47 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FirebaseConnectionController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// // Public API Routes
-// Route::name('api.')->group(function () {
-//     Route::post('/register', [AuthController::class, 'register'])->name('register');
-//     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
-// });
+// Starting Route
+Route::get('/', function () {
+    return view('intro');
+})->name('intro');
 
-// // Protected API Routes (Requires Sanctum Bearer Token)
-// Route::middleware('auth:sanctum')
-//     ->name('api.')      // automatically prefixed all inner route names with 'api.'    
-//     ->group(function () {
-//         Route::get('/tasks', [TaskController::class, 'index'])->name('tasks');
-//         Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-//         Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-//         Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+// Users Route
+Route::controller(UserController::class)->group(function () {
+    Route::get('/users', 'showUsers')->name('users');
+});
 
-//         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// });
+// Testing firebase
+// Route::get('/firebase-test', [FirebaseController::class, 'test']);
+Route::get('/firebase-test', [FirebaseConnectionController::class, 'index']);
 
-// Route::get('/users', [UserController::class, 'showUsers'])->name('users');
+// Guest Routes (Only accessible when NOT logged in)
+Route::middleware('guest')->controller(AuthController::class)->group(function () {
+    Route::get('/register', 'showRegister');
+    Route::get('/login', 'showLogin');
+    
+    Route::post('/register', 'register');
+    Route::post('/login', 'login')->middleware('throttle:5,1');
+});
+
+// Authenticated Routes (Requires user to be logged in)
+Route::middleware('auth')->group(function () {
+    // Task Routes
+    Route::controller(TaskController::class)->prefix('tasks')->name('tasks.')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/', 'store');
+        Route::get('/{task}', 'preview');
+        Route::put('/{task}', 'change');
+    });
+
+    // Logout Route
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+
+

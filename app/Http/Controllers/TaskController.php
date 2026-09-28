@@ -14,22 +14,6 @@ use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    // POST: Create Task
-    public function store(StoreTaskRequest $request)
-    {
-        // Safely extract uploaded files array or fallback to an empty array
-        $files = $request->hasFile('files') ? $request->file('files') : [];
-
-        // Run action to create task, upload files & queue email
-        $task = CreateTaskAction::run(
-            user: $request->user(),
-            data: $request->validated(),
-            files: $files
-        );
-
-        return back()->with('success', 'Task created successfully!');
-    }
-
     // GET: Retrieve all tasks with filter tasks
     public function index(Request $request)
     {
@@ -47,6 +31,16 @@ class TaskController extends Controller
             ? 'roles.admin.admin_task'
             : 'roles.member.member_task';
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => "List of Tasks for " . $request->user()->name . " - " . ($request->user()->email),
+                'data' => [
+                    'tasks' => $result['tasks'],
+                    'counts' => $result['counts'],
+                ]
+            ], 200);
+        }
+
         return view($view, [
             'members'              => User::where('role', UserRole::MEMBER)->get(),
             'tasks'                => $result['tasks'],
@@ -58,6 +52,31 @@ class TaskController extends Controller
             'highTasksCount'       => $result['counts']['high'],
         ]);
     }
+
+
+    // POST: Create Task
+    public function store(StoreTaskRequest $request)
+    {
+        // Safely extract uploaded files array or fallback to an empty array
+        $files = $request->hasFile('files') ? $request->file('files') : [];
+
+        // Run action to create task, upload files & queue email
+        $task = CreateTaskAction::run(
+            user: $request->user(),
+            data: $request->validated(),
+            files: $files
+        );
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Tasks created successfully - by ' . $request->user()->name . ' - ' . $request->user()->email,
+                'task' => $task,
+            ]);
+        }
+
+        return back()->with('success', 'Task created successfully!');
+    }
+
 
     // GET: Preview Task
     public function preview(Request $request, Task $task)
@@ -76,6 +95,7 @@ class TaskController extends Controller
             'status' => $task->status,
         ]);
     }
+
 
     // PUT: Change Task details
     public function change(UpdateTaskRequest $request, Task $task)

@@ -20,40 +20,35 @@ class ShowTaskAction
 
     public function handle(User $user, array $filters = []): array
     {
-        // Query tasks owned by user or where user is listed as a collaborator
-        $accessibleTasks = Task::query()
-            ->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhere('collaborator_email', $user->email)
-                    ->orWhere('collaborator_email', 'like', $user->email . ',%')
-                    ->orWhere('collaborator_email', 'like', '%,' . $user->email)
-                    ->orWhere('collaborator_email', 'like', '%,' . $user->email . ',%');
-            });
+        // Base query for tasks the user can access
+        $baseQuery = Task::where(function ($query) use ($user) {
+            $query->where('user_id', $user->id)
+                ->orWhere('collaborator_email', $user->email)
+                ->orWhere('collaborator_email', 'like', $user->email . ',%')
+                ->orWhere('collaborator_email', 'like', '%,' . $user->email)
+                ->orWhere('collaborator_email', 'like', '%,' . $user->email . ',%');
+        });
 
-        // Compute counts from accessible tasks base query
+        // Calculate counts
         $counts = [
-            'total' => (clone $accessibleTasks)->count(),
-            'in_progress' => (clone $accessibleTasks)->where('status', TaskStatus::IN_PROGRESS->value)->count(),
-            'completed' => (clone $accessibleTasks)->where('status', TaskStatus::COMPLETED->value)->count(),
-            'low' => (clone $accessibleTasks)->where('priority', TaskPriority::LOW->value)->count(),
-            'medium' => (clone $accessibleTasks)->where('priority', TaskPriority::MEDIUM->value)->count(),
-            'high' => (clone $accessibleTasks)->where('priority', TaskPriority::HIGH->value)->count(),
+            'total' => (clone $baseQuery)->count(),
+            'in_progress' => (clone $baseQuery)->where('status', TaskStatus::IN_PROGRESS->value)->count(),
+            'completed' => (clone $baseQuery)->where('status', TaskStatus::COMPLETED->value)->count(),
+            'low' => (clone $baseQuery)->where('priority', TaskPriority::LOW->value)->count(),
+            'medium' => (clone $baseQuery)->where('priority', TaskPriority::MEDIUM->value)->count(),
+            'high' => (clone $baseQuery)->where('priority', TaskPriority::HIGH->value)->count(),
         ];
 
-        // Apply filters
-        $query = (clone $accessibleTasks)->with('user');
+        // Apply status and priority  filters
+        $query = (clone $baseQuery)->with('user');
 
-        // Status filter (Array checks using !empty)
-        $query->when(
-            ! empty($filters['status']) && $filters['status'] !== 'all',
-            fn ($q) => $q->where('status', $filters['status'])
-        );
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $query->where('status', $filters['status']);
+        }
 
-        // Priority filter
-        $query->when(
-            ! empty($filters['priority']) && $filters['priority'] !== 'all',
-            fn ($q) => $q->where('priority', $filters['priority'])
-        );
+        if (!empty($filters['priority']) && $filters['priority'] !== 'all') {
+            $query->where('priority', $filters['priority']);
+        }
 
         // Fetch paginated tasks and append query parameters
         $tasks = $query->latest()->paginate(5)->withQueryString();

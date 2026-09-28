@@ -14,14 +14,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Use this before testing in POSTMAN
-        // $middleware->validateCsrfTokens(except: [
-        // 'register',
-        // 'login',
-        // 'logout',
-        // 'tasks',
-        // 'tasks/*',
-        // ]);
+        
+        // Enables standard Laravel sessions on routes/api.php
+        $middleware->appendToGroup('api', [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        ]);
+
+        // Prevent CSRF checks for Postman testing
+        $middleware->preventRequestForgery(except: [
+            'api/register',
+            'api/login',
+            'api/logout',
+            'api/tasks',
+            'api/tasks/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

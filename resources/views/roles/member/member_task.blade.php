@@ -19,50 +19,8 @@
         @endif
     </div>
 
-    <!-- Filter by Status -->
-    <p class="text-xs text-slate-400 mb-2">Filter by status</p>
-    <div class="flex gap-2 font-roboto text-xs">
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('status', 'all') == 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            All Tasks ({{ $totalTasksCount }})
-        </a>
-
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'in_progress']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('status') == 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            InProgress ({{ $inProgressTasksCount }})
-        </a>
-
-        <a href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('status') == 'completed' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            Completed ({{ $completedTasksCount }})
-        </a>
-    </div>
-
-    <hr class="border-white/10 my-4">
-
-    <!-- Filter by Priority -->
-    <p class="text-xs text-slate-400 mb-2">Filter by priority</p>
-    <div class="flex gap-2 font-roboto text-xs">
-        <a href="{{ request()->fullUrlWithQuery(['priority' => 'all']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('priority', 'all') == 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            All Priority ({{ $totalTasksCount }})
-        </a>
-
-        <a href="{{ request()->fullUrlWithQuery(['priority' => 'low']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('priority') == 'low' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            Low ({{ $lowTasksCount }})
-        </a>
-
-        <a href="{{ request()->fullUrlWithQuery(['priority' => 'medium']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('priority') == 'medium' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            Medium ({{ $mediumTasksCount }})
-        </a>
-
-        <a href="{{ request()->fullUrlWithQuery(['priority' => 'high']) }}"
-            class="px-3 py-1 rounded-md border transition {{ request('priority') == 'high' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}">
-            High ({{ $highTasksCount }})
-        </a>
-    </div>
+    <!-- Filter by Status & Priority -->
+    <livewire:tasks.task-filter />
 
     <hr class="border-white/10 my-4">
 
@@ -70,16 +28,14 @@
     <button 
         type="button" 
         x-data
-        @click="$dispatch('open-modal', 'add-task-modal')" 
+        @click="$dispatch('open-modal', 'create-task-modal')" 
         class="px-4 py-2 mb-5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg transition cursor-pointer"
     >
         + Add Task
     </button>
 
     <!-- Task List Container -->
-    <div>
-        <livewire:tasks.task-list />
-    </div>
+    <livewire:tasks.task-list />
 
     <!-- Pagination -->
     <div class="mt-4">

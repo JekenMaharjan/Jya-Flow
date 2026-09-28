@@ -35,6 +35,13 @@ class AuthController extends Controller
         // Pass validated data into Action
         $user = RegisterUserAction::run($request->validated());
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => "User registered successfully! Please log in.",
+                'user' => $user,
+            ], 201);
+        }
+        
         return redirect()
             ->route('login')
             ->with('success', 'User registered successfully! Please log in.');
@@ -48,7 +55,18 @@ class AuthController extends Controller
 
         // Start session & prevent Session Fixation attacks
         Auth::login($user);
-        $request->session()->regenerate();
+        
+        // Safely manage sessions ONLY if the route has session middleware
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => "User logged in successfully!",
+                'user' => $user,
+            ], 200);
+        }
 
         return redirect()
             ->intended(route('tasks.index'))
@@ -60,7 +78,8 @@ class AuthController extends Controller
     {
         $user = Auth::user();
 
-        if ($user && $user->firebase_uid) {
+        // Safely revoke Firebase tokens if user exists
+        if ($user?->firebase_uid) {
             try {
                 $this->firebaseAuth->revokeRefreshTokens($user->firebase_uid);
             } catch (\Throwable $e) {
@@ -68,84 +87,19 @@ class AuthController extends Controller
             }
         }
 
+        // Clear Laravel auth session and invalidate CSRF
         Auth::logout();
-
-        if ($user && $user->firebase_uid) {
-            $this->firebaseAuth->revokeRefreshTokens($user->firebase_uid);
-        }
-
-        // Invalidate web session & regenerate CSRF token
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'User logged out successfully.'
+            ], 200);
+        }
 
         return redirect()
             ->route('login')
             ->with('success', 'User logged out successfully.');
     }
-
-    // // ======================== REGISTER ========================
-    // public function register(RegisterAuthRequest $request)
-    // {
-    //     // 1. Validate incoming request
-    //     $validatedCredentials = $request->validated();
-
-    //     // 2. Create the user
-    //     $user = User::create([
-    //         'name' => $validatedCredentials['name'],
-    //         'email' => $validatedCredentials['email'],
-    //         'password' => Hash::make($validatedCredentials['password']),
-    //     ]);
-
-    //     // 3. Create Sanctum token
-    //     $token = $user->createToken('task-manager-api')->plainTextToken;
-
-    //     // 4. Return JSON response with 201 Created status
-    //     if ($request->wantsJson()) {
-    //         return response()->json([
-    //             'message' => 'User has been successfully created!',
-    //             'data' => [
-    //                 'token' => $token,
-    //                 'user' => [
-    //                     'name' => $user->name,
-    //                     'email' => $user->email,
-    //                 ]
-    //             ]
-    //         ], 201);
-    //     }
-
-    //     // Redirect to the login route with a success message
-    //     return redirect()->route('login')->with('status', 'Registration successful! Please log in.');
-    // }
-
-
-    // // ======================== LOGIN ========================
-    // public function login(LoginAuthRequest $request)
-    // {
-    //     // 1. Validate incoming input
-    //     $credentials = $request->validated();
-
-    //     // 2. Find the user as per provided email
-    //     $user = User::where('email', $credentials['email'])->first();
-
-    //     // 3. Check password of the user found through email
-    //     if (!$user || !Hash::check($credentials['password'], $user->password)) {
-    //         return response()->json([
-    //             'message' => 'Invalid login credentials'
-    //         ], 401);
-    //     }
-
-    //     // 4. Issue Sanctum Token
-    //     $token = $user->createToken('auth-token')->plainTextToken;
-
-    //     if ($request->wantsJson()) {
-    //         return response()->json([
-    //         'message' => 'Logged in Successfully!',
-    //         'token' => $token,
-    //         'user' => $user,
-    //         'redirect' => route('api.tasks.index'),
-    //     ], 200);
-    //     }
-
-    //     return redirect()->route('tasks.index')->with('status', 'You have been logged in successfully.');
-    // }
 }
