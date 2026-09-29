@@ -18,7 +18,7 @@ class ShowTaskAction
         //
     }
 
-    public function handle(User $user, array $filters = []): array
+    public function handle(User $user, array $filters = [], int $perPage = 7): array
     {
         // Base query for tasks the user can access
         $baseQuery = Task::where(function ($query) use ($user) {
@@ -51,7 +51,7 @@ class ShowTaskAction
         }
 
         // Fetch paginated tasks and append query parameters
-        $tasks = $query->latest()->paginate(5)->withQueryString();
+        $tasks = $query->latest()->paginate($perPage);
 
         return [
             'tasks' => $tasks,

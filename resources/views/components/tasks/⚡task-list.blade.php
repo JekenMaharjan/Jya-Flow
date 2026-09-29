@@ -3,15 +3,35 @@
 use App\Models\Task;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
 
 new class extends Component
 {
-    // Re-render the entire list when ANY user creates, deletes, or updates a task
+    use WithPagination;
+
+    public int $perPage = 7;
+
+    public function loadMore()
+    {
+        $this->perPage += 7;
+    }
+
+    // Listener for Echo broadcasts or local events
+    #[On('echo-private:tasks,TaskCreated')]
+    #[On('echo-private:tasks,TaskDeleted')]
     #[On('refresh-task-list')]
+    public function refreshList(): void
+    {
+        // Re-renders automatically on any real-time update
+    }
+
     public function render()
     {
+        // Query tasks using the dynamic perPage limit
+        $tasks = Task::latest()->paginate($this->perPage);
+
         return view('components.tasks.⚡task-list', [
-            'tasks' => Task::latest()->get(),
+            'tasks' => $tasks,
         ]);
     }
 };
@@ -24,10 +44,6 @@ new class extends Component
                 :task="$task" 
                 :wire:key="'task-row-'.$task->id" 
             />
-
-            <!-- Include per task inside loop -->
-            @include('modal.previewTask', ['task' => $task])
-            
         @empty
             <!-- Empty State -->
             <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/1">
@@ -39,4 +55,19 @@ new class extends Component
             </li>
         @endforelse
     </ul>
+
+    <!-- Infinite Scroll Sentinel -->
+    @if($tasks->hasMorePages())
+        <div 
+            x-intersect.full="$wire.loadMore()" 
+            class="py-6 text-center text-xs text-slate-400 cursor-pointer"
+        >
+            <span wire:loading.remove wire:target="loadMore">
+                Scroll down (or click here) to load more...
+            </span>
+            <span wire:loading wire:target="loadMore">
+                Loading more tasks...
+            </span>
+        </div>
+    @endif
 </div>

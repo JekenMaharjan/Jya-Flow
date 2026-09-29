@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskCreated
+class TaskCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -31,7 +31,22 @@ class TaskCreated
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('tasks'),
+        ];
+    }
+
+    //Define custom payload sent to listeners.
+    public function broadcastWith(): array
+    {
+        return [
+            'id'                  => $this->task->id,
+            'user_id'             => $this->task->user_id,
+            'title'               => $this->task->title,
+            'description'         => $this->task->description,
+            'status'              => $this->task->status?->value ?? $this->task->status,
+            'priority'            => $this->task->priority?->value ?? $this->task->priority,
+            'collaborator_email'  => $this->task->collaborator_email,
+            'due_at'              => $this->task->due_at?->toIso8601String(),
         ];
     }
 }

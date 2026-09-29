@@ -39,6 +39,7 @@ class DeleteTaskAction
         $taskData = $task->toArray();
         $userEmail = $task->user->email;
 
-        TaskDeleted::dispatch($taskData, $userEmail);
+        // Laravel Broadcasting
+        broadcast(new TaskDeleted($taskData, $userEmail))->toOthers();
     }
 }

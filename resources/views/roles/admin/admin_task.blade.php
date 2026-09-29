@@ -28,7 +28,7 @@
         :in-progress-tasks-count = ""
         :completed-tasks-count = ""
         :low-tasks-count = ""
-        :medium-tasks-cont = ""
+        :medium-tasks-count = ""
         :high-tasks-count = ""
     />
 
@@ -45,12 +45,7 @@
     </button>
 
     <!-- Task List -->
-    <livewire:tasks.task-list />
-
-    <!-- Pagination -->
-    <div class="mt-4">
-        {{ $tasks->appends(request()->query())->links() }}
-    </div>
+    <livewire:tasks.task-list :/>
 </div>
 
 @include('tasks.create-task-modal')

@@ -20,7 +20,8 @@ class TaskController extends Controller
         // Run action to retrieve tasks with filters
         $result = ShowTaskAction::run(
             user: $request->user(),
-            filters: $request->only(['status', 'priority'])
+            filters: $request->only(['status', 'priority']),
+            perPage: 7,
         );
 
         // Check admin user - enum value directly
