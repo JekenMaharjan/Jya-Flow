@@ -101,7 +101,7 @@
             </select>
             @error('status') <p class="mt-1 text-xs text-red-400 font-medium">{{ $message }}</p> @enderror
         </div>
-
+        
         <!-- Collaborators -->
         <div>
             <label class="{{ $labelClass }}">Collaborators</label>

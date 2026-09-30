@@ -2,6 +2,7 @@
 
 namespace App\Actions\Task;
 
+use App\Enums\TaskStatus;
 use App\Events\TaskUpdated;
 use App\Models\Task;
 use App\Models\User;
@@ -43,6 +44,14 @@ class UpdateTaskAction
             $data['filename'] = $uploadedFiles;
         }
 
+        // A completed task can never return to in-progress status
+        if (
+            $task->status === TaskStatus::COMPLETED &&
+            ($data['status'] ?? null) !== TaskStatus::COMPLETED->value
+        ) {
+            $data['status'] = TaskStatus::COMPLETED->value;
+        }
+
         // Format collaborator array into a clean comma-separated string
         if (!empty($data['collaborator_email']) && is_array($data['collaborator_email'])) {
             $data['collaborator_email'] = implode(',', array_filter($data['collaborator_email']));
@@ -57,10 +66,14 @@ class UpdateTaskAction
             $task->due_soon_alert_sent = false;
         }
 
-        $task->update($data);
+        $task->save();
 
         // Sync to Firebase
-        $this->firestore->database()->collection('tasks')->document((string) $task->id)->set([
+        $this->firestore
+            ->database()
+            ->collection('tasks')
+            ->document((string) $task->id)
+            ->set([
                 'title'                 => $task->title,
                 'description'           => $task->description,
                 'filename'              => $task->filename,
@@ -71,6 +84,32 @@ class UpdateTaskAction
                 'last_updated_by'       => $task->last_updated_by,
                 'updated_at'            => now()->toIso8601String(),
                 'due_soon_alert_sent'   => $task->due_soon_alert_sent,
+            ], ['merge' => true]);
+
+        broadcast(new TaskUpdated($task))->toOthers();
+
+        return $task;
+    }
+    
+    public function markCompleted(User $user, Task $task): Task
+    {
+        if ($task->status === TaskStatus::COMPLETED) {
+            return $task;
+        }
+
+        $task->status = TaskStatus::COMPLETED;
+        $task->last_updated_by = $user->email;
+
+        $task->save();
+
+        $this->firestore
+            ->database()
+            ->collection('tasks')
+            ->document((string) $task->id)
+            ->set([
+                'status'          => TaskStatus::COMPLETED->value,
+                'last_updated_by' => $user->email,
+                'updated_at'      => now()->toIso8601String(),
             ], ['merge' => true]);
 
         broadcast(new TaskUpdated($task))->toOthers();

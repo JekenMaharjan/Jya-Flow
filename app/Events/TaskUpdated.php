@@ -3,23 +3,22 @@
 namespace App\Events;
 
 use App\Models\Task;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskUpdated implements ShouldBroadcastNow
+class TaskUpdated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(public Task $task)
+    public function __construct(public Task $task) 
     {
         //
     }
@@ -46,14 +45,14 @@ class TaskUpdated implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'id'                  => $this->task->id,
-            'user_id'             => $this->task->user_id,
-            'title'               => $this->task->title,
-            'description'         => $this->task->description,
-            'status'              => $this->task->status?->value ?? $this->task->status,
-            'priority'            => $this->task->priority?->value ?? $this->task->priority,
-            'collaborator_email'  => $this->task->collaborator_email,
-            'due_at'              => $this->task->due_at?->toIso8601String(),
+            'id' => $this->task->id,
+            'user_id' => $this->task->user_id,
+            'title' => $this->task->title,
+            'description' => $this->task->description,
+            'status' => $this->task->status?->value ?? $this->task->status,
+            'priority' => $this->task->priority?->value ?? $this->task->priority,
+            'collaborator_email' => $this->task->collaborator_email,
+            'due_at' => $this->task->due_at?->toIso8601String(),
         ];
     }
 }

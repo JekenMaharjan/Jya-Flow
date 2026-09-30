@@ -11,14 +11,31 @@
         <!-- Title -->
         <div>
             <label for="title" class="{{ $labelClass }}">Title</label>
-            <input type="text" name="title" id="title" placeholder="Add title" value="{{ old('title') }}" required class="{{ $inputClass }}">
+            <input 
+                type="text" 
+                name="title" 
+                id="title" 
+                placeholder="Add title" 
+                value="{{ old('title') }}" 
+                required 
+                class="{{ $inputClass }}"
+            >
             @error('title') <p class="mt-1 text-xs text-red-400 font-medium">{{ $message }}</p> @enderror
         </div>
 
         <!-- Description -->
         <div>
             <label for="description" class="{{ $labelClass }}">Description</label>
-            <textarea name="description" id="description" placeholder="Add description" rows="4" required class="{{ $inputClass }} resize-none">{{ old('description') }}</textarea>
+            <textarea 
+                name="description" 
+                id="description" 
+                placeholder="Add description" 
+                rows="4" 
+                required 
+                class="{{ $inputClass }} resize-none"
+            >
+                {{ old('description') }}
+            </textarea>
             @error('description') <p class="mt-1 text-xs text-red-400 font-medium">{{ $message }}</p> @enderror
         </div>
 
@@ -39,7 +56,14 @@
         <!-- Due Date -->
         <div>
             <label for="due_at" class="{{ $labelClass }}">Due Date</label>
-            <input type="datetime-local" name="due_at" id="due_at" value="{{ old('due_at') }}" required class="{{ $inputClass }}">
+            <input 
+                type="datetime-local" 
+                name="due_at" 
+                id="due_at" 
+                value="{{ old('due_at') }}" 
+                required 
+                class="{{ $inputClass }}"
+            >
             @error('due_at') <p class="mt-1 text-xs text-red-400 font-medium">{{ $message }}</p> @enderror
         </div>
 

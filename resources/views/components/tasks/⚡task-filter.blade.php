@@ -22,15 +22,24 @@ new class extends Component
     public function setStatus(string $value): void
     {
         $this->status = $value;
-        $this->dispatch('filter-changed', status: $this->status, priority: $this->priority);
+        $this->dispatch(
+            'filter-changed',
+            status: $this->status, 
+            priority: $this->priority
+        );
     }
 
     public function setPriority(string $value): void
     {
         $this->priority = $value;
-        $this->dispatch('filter-changed', status: $this->status, priority: $this->priority);
+        $this->dispatch(
+            'filter-changed', 
+            status: $this->status, 
+            priority: $this->priority
+        );
     }
 };
+
 ?>
 
 <div>
@@ -40,7 +49,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setStatus('all')"
-                class="px-3 py-1 rounded-md border transition {{ $status === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $status === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 All Tasks ({{ $totalTasksCount }})
             </button>
@@ -48,7 +57,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setStatus('in_progress')"
-                class="px-3 py-1 rounded-md border transition {{ $status === 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $status === 'in_progress' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 InProgress ({{ $inProgressTasksCount }})
             </button>
@@ -56,7 +65,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setStatus('completed')"
-                class="px-3 py-1 rounded-md border transition {{ $status === 'completed' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $status === 'completed' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 Completed ({{ $completedTasksCount }})
             </button>
@@ -71,7 +80,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setPriority('all')"
-                class="px-3 py-1 rounded-md border transition {{ $priority === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $priority === 'all' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 All Priority ({{ $totalTasksCount }})
             </button>
@@ -79,7 +88,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setPriority('low')"
-                class="px-3 py-1 rounded-md border transition {{ $priority === 'low' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $priority === 'low' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 Low ({{ $lowTasksCount }})
             </button>
@@ -87,7 +96,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setPriority('medium')"
-                class="px-3 py-1 rounded-md border transition {{ $priority === 'medium' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $priority === 'medium' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 Medium ({{ $mediumTasksCount }})
             </button>
@@ -95,7 +104,7 @@ new class extends Component
             <button 
                 type="button"
                 wire:click="setPriority('high')"
-                class="px-3 py-1 rounded-md border transition {{ $priority === 'high' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
+                class="px-3 py-1 rounded-md border cursor-pointer transition {{ $priority === 'high' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300' }}"
             >
                 High ({{ $highTasksCount }})
             </button>

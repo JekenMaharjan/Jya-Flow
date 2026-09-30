@@ -1,9 +1,8 @@
-
 <?php
 
 use App\Actions\Task\ShowTaskAction;
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 use Livewire\WithPagination;
 
 new class extends Component
@@ -17,20 +16,35 @@ new class extends Component
         $this->perPage += 7;
     }
 
-    // Refresh when a task is created by another user.
+    public string $status = 'all';
+    public string $priority = 'all';
+
+    #[On('filter-changed')]
+    public function applyFilters(string $status, string $priority): void
+    {
+        $this->status = $status;
+        $this->priority = $priority;
+
+        $this->resetPage();
+    }
+
     #[On('refresh-task-list')]
     #[On('echo-private:tasks,.TaskCreated')]
     #[On('echo-private:tasks,.TaskUpdated')]
     #[On('echo-private:tasks,.TaskDeleted')]
     public function refreshTaskList(): void
     {
-        // Livewire automatically re-renders after this event.
+        // Receiving the event causes Livewire to render again.
     }
 
     public function render()
     {
         $result = ShowTaskAction::run(
             user: auth()->user(),
+            filters: [
+                'status' => $this->status,
+                'priority' => $this->priority,
+            ],
             perPage: $this->perPage,
         );
 
@@ -46,8 +60,8 @@ new class extends Component
     <ul class="space-y-3 mb-5">
         @forelse($tasks as $task)
             <livewire:tasks.task-action-button
-                :task="$task" 
-                :wire:key="'task-row-'.$task->id" 
+                :task="$task"
+                :wire:key="'task-row-'.$task->id.'-'.$task->updated_at?->timestamp"
             />
         @empty
             <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/5">
@@ -67,12 +81,12 @@ new class extends Component
     </ul>
 
     @if($tasks->hasMorePages())
-        <div 
-            x-intersect.full="$wire.loadMore()" 
+        <div
+            x-intersect.full="$wire.loadMore()"
             class="py-6 text-center text-xs text-slate-400 cursor-pointer"
         >
             <span wire:loading.remove wire:target="loadMore">
-                Scroll down (or click here) to load more...
+                Scroll down (or click here to load more)...
             </span>
 
             <span wire:loading wire:target="loadMore">

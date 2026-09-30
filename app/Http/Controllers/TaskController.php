@@ -54,7 +54,6 @@ class TaskController extends Controller
         ]);
     }
 
-
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
@@ -78,7 +77,6 @@ class TaskController extends Controller
         return back()->with('success', 'Task created successfully!');
     }
 
-
     // GET: Preview Task
     public function preview(Request $request, Task $task)
     {
@@ -96,7 +94,6 @@ class TaskController extends Controller
             'status' => $task->status,
         ]);
     }
-
 
     // PUT: Change Task details
     public function change(UpdateTaskRequest $request, Task $task)
