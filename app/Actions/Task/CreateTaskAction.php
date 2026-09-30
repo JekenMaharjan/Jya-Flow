@@ -59,9 +59,6 @@ class CreateTaskAction
             'due_soon_alert_sent'   => false,
         ]);
 
-        // // Dispatch Event
-        // TaskCreated::dispatch($task);
-
         // Broadcast the TaskCreated Event to all other connected users
         broadcast(new TaskCreated($task))->toOthers();
 

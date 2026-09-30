@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Models\Task;
@@ -11,27 +12,25 @@ new class extends Component
 
     public int $perPage = 7;
 
-    public function loadMore()
+    public function loadMore(): void
     {
         $this->perPage += 7;
     }
 
     // Listener for Echo broadcasts or local events
     #[On('echo-private:tasks,TaskCreated')]
+    #[On('echo-private:tasks,TaskUpdated')]
     #[On('echo-private:tasks,TaskDeleted')]
     #[On('refresh-task-list')]
-    public function refreshList(): void
+    public function refreshList(): void 
     {
-        // Re-renders automatically on any real-time update
+        // Livewire automatically Re-renders render() on any real-time update
     }
 
     public function render()
     {
-        // Query tasks using the dynamic perPage limit
-        $tasks = Task::latest()->paginate($this->perPage);
-
         return view('components.tasks.⚡task-list', [
-            'tasks' => $tasks,
+            'tasks' => Task::latest()->paginate($this->perPage),
         ]);
     }
 };
@@ -45,10 +44,9 @@ new class extends Component
                 :wire:key="'task-row-'.$task->id" 
             />
         @empty
-            <!-- Empty State -->
-            <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/1">
+            <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/5">
                 <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-800/80 border border-white/10 flex items-center justify-center">
-                    <x-carbon-task class="w-6.25 text-slate-500"/>
+                    <x-carbon-task class="w-6 h-6 text-slate-500"/>
                 </div>
                 <p class="text-sm font-medium text-slate-300">No tasks found</p>
                 <p class="text-xs text-slate-500 mt-1">Add a task above to get started!</p>
@@ -56,7 +54,6 @@ new class extends Component
         @endforelse
     </ul>
 
-    <!-- Infinite Scroll Sentinel -->
     @if($tasks->hasMorePages())
         <div 
             x-intersect.full="$wire.loadMore()" 

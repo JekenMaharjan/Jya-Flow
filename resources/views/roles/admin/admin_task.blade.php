@@ -9,10 +9,21 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
         <div>
-            <h2 class="text-2xl font-bold font-serif text-white tracking-wide">
-                My Tasks <span class="font-light text-sm text-slate-400">( Admin )</span>
-            </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Manage your daily priorities</p>
+            <div class="flex items-center gap-2.5">
+                <h2 class="text-xl font-semibold tracking-tight text-white font-sans">
+                    Task Management
+                </h2>
+                
+                <!-- Context / Role Badge -->
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                    Admin Workspace
+                </span>
+            </div>
+            
+            <p class="text-xs text-slate-400 mt-1">
+                Monitor, assign, and manage team deliverables across all projects.
+            </p>
         </div>
         
         @if($totalTasksCount > 0)
@@ -45,7 +56,7 @@
     </button>
 
     <!-- Task List -->
-    <livewire:tasks.task-list :/>
+    <livewire:tasks.task-list />
 </div>
 
 @include('tasks.create-task-modal')

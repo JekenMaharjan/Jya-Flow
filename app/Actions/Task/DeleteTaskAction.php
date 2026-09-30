@@ -30,14 +30,15 @@ class DeleteTaskAction
 
         // Delete from local SQLite database
         $taskId = $task->id;
-        $task->delete();
-
-        // Delete document from Firestore (Triggers real-time sync for other users)
-        $this->firestore->database()->collection('tasks')->document((string) $taskId)->delete();
 
         // Capture task attributes as an array BEFORE deletion for queued mail
         $taskData = $task->toArray();
         $userEmail = $task->user->email;
+
+        $task->delete();
+
+        // Delete document from Firestore (Triggers real-time sync for other users)
+        $this->firestore->database()->collection('tasks')->document((string) $taskId)->delete();
 
         // Laravel Broadcasting
         broadcast(new TaskDeleted($taskData, $userEmail))->toOthers();

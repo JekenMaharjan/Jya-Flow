@@ -7,11 +7,11 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskCreated implements ShouldBroadcast
+class TaskCreated implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -33,6 +33,12 @@ class TaskCreated implements ShouldBroadcast
         return [
             new PrivateChannel('tasks'),
         ];
+    }
+
+    // Set explicit broadcast name for Echo listeners
+    public function broadcastAs(): string
+    {
+        return 'TaskCreated';
     }
 
     //Define custom payload sent to listeners.

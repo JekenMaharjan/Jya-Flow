@@ -2,6 +2,7 @@
 
 namespace App\Actions\Task;
 
+use App\Events\TaskUpdated;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -56,7 +57,7 @@ class UpdateTaskAction
             $task->due_soon_alert_sent = false;
         }
 
-        $task->save();
+        $task->update($data);
 
         // Sync to Firebase
         $this->firestore->database()->collection('tasks')->document((string) $task->id)->set([
@@ -71,6 +72,8 @@ class UpdateTaskAction
                 'updated_at'            => now()->toIso8601String(),
                 'due_soon_alert_sent'   => $task->due_soon_alert_sent,
             ], ['merge' => true]);
+
+        broadcast(new TaskUpdated($task))->toOthers();
 
         return $task;
     }
