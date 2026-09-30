@@ -12,9 +12,9 @@ const app = initializeApp({
 
 export const db = getFirestore(app);
 
-// Real-time listener: triggers Livewire refresh on actual data changes
-onSnapshot(collection(db, "tasks"), (snapshot) => {
-    if (!snapshot.metadata.hasPendingWrites && snapshot.docChanges().length > 0) {
-        window.Livewire?.dispatch("refresh-task-list");
-    }
-});
+// // Real-time listener: triggers Livewire refresh on actual data changes
+// onSnapshot(collection(db, "tasks"), (snapshot) => {
+//     if (!snapshot.metadata.hasPendingWrites && snapshot.docChanges().length > 0) {
+//         window.Livewire?.dispatch("refresh-task-list");
+//     }
+// });

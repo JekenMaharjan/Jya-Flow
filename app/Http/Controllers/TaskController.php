@@ -20,7 +20,8 @@ class TaskController extends Controller
         // Run action to retrieve tasks with filters
         $result = ShowTaskAction::run(
             user: $request->user(),
-            filters: $request->only(['status', 'priority'])
+            filters: $request->only(['status', 'priority']),
+            perPage: 7,
         );
 
         // Check admin user - enum value directly
@@ -53,7 +54,6 @@ class TaskController extends Controller
         ]);
     }
 
-
     // POST: Create Task
     public function store(StoreTaskRequest $request)
     {
@@ -77,7 +77,6 @@ class TaskController extends Controller
         return back()->with('success', 'Task created successfully!');
     }
 
-
     // GET: Preview Task
     public function preview(Request $request, Task $task)
     {
@@ -95,7 +94,6 @@ class TaskController extends Controller
             'status' => $task->status,
         ]);
     }
-
 
     // PUT: Change Task details
     public function change(UpdateTaskRequest $request, Task $task)

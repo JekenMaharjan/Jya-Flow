@@ -1,42 +1,97 @@
 <?php
 
-use App\Models\Task;
-use Livewire\Component;
+use App\Actions\Task\ShowTaskAction;
 use Livewire\Attributes\On;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 new class extends Component
 {
-    // Re-render the entire list when ANY user creates, deletes, or updates a task
+    use WithPagination;
+
+    public int $perPage = 7;
+
+    public function loadMore(): void
+    {
+        $this->perPage += 7;
+    }
+
+    public string $status = 'all';
+    public string $priority = 'all';
+
+    #[On('filter-changed')]
+    public function applyFilters(string $status, string $priority): void
+    {
+        $this->status = $status;
+        $this->priority = $priority;
+
+        $this->resetPage();
+    }
+
     #[On('refresh-task-list')]
+    #[On('echo-private:tasks,.TaskCreated')]
+    #[On('echo-private:tasks,.TaskUpdated')]
+    #[On('echo-private:tasks,.TaskDeleted')]
+    public function refreshTaskList(): void
+    {
+        // Receiving the event causes Livewire to render again.
+    }
+
     public function render()
     {
+        $result = ShowTaskAction::run(
+            user: auth()->user(),
+            filters: [
+                'status' => $this->status,
+                'priority' => $this->priority,
+            ],
+            perPage: $this->perPage,
+        );
+
         return view('components.tasks.⚡task-list', [
-            'tasks' => Task::latest()->get(),
+            'tasks' => $result['tasks'],
         ]);
     }
 };
+
 ?>
 
 <div>
     <ul class="space-y-3 mb-5">
         @forelse($tasks as $task)
             <livewire:tasks.task-action-button
-                :task="$task" 
-                :wire:key="'task-row-'.$task->id" 
+                :task="$task"
+                :wire:key="'task-row-'.$task->id.'-'.$task->updated_at?->timestamp"
             />
-
-            <!-- Include per task inside loop -->
-            @include('modal.previewTask', ['task' => $task])
-            
         @empty
-            <!-- Empty State -->
-            <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/1">
+            <li class="text-center py-10 px-4 rounded-xl border border-dashed border-white/10 bg-white/5">
                 <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-800/80 border border-white/10 flex items-center justify-center">
-                    <x-carbon-task class="w-6.25 text-slate-500"/>
+                    <x-carbon-task class="w-6 h-6 text-slate-500"/>
                 </div>
-                <p class="text-sm font-medium text-slate-300">No tasks found</p>
-                <p class="text-xs text-slate-500 mt-1">Add a task above to get started!</p>
+
+                <p class="text-sm font-medium text-slate-300">
+                    No tasks found
+                </p>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Add a task above to get started!
+                </p>
             </li>
         @endforelse
     </ul>
+
+    @if($tasks->hasMorePages())
+        <div
+            x-intersect.full="$wire.loadMore()"
+            class="py-6 text-center text-xs text-slate-400 cursor-pointer"
+        >
+            <span wire:loading.remove wire:target="loadMore">
+                Scroll down (or click here to load more)...
+            </span>
+
+            <span wire:loading wire:target="loadMore">
+                Loading more tasks...
+            </span>
+        </div>
+    @endif
 </div>

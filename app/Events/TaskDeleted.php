@@ -11,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TaskDeleted
+class TaskDeleted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -19,6 +19,7 @@ class TaskDeleted
      * Create a new event instance.
      */
     public function __construct(
+        public int $taskId,
         public array $taskData,
         public string $userEmail
     )
@@ -34,7 +35,23 @@ class TaskDeleted
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new PrivateChannel('tasks'),
+        ];
+    }
+
+    // Set explicit broadcast name for Echo listeners
+    public function broadcastAs(): string
+    {
+        return 'TaskDeleted';
+    }
+
+    //Define custom payload sent to listeners.
+    public function broadcastWith(): array
+    {
+        return [
+            'task_id'       => $this->taskId,
+            'task_data'     => $this->taskData,
+            'user_email'    => $this->userEmail,
         ];
     }
 }
