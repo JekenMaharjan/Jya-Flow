@@ -1,7 +1,7 @@
 
 <?php
 
-use App\Models\Task;
+use App\Actions\Task\ShowTaskAction;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
@@ -17,23 +17,29 @@ new class extends Component
         $this->perPage += 7;
     }
 
-    // Listener for Echo broadcasts or local events
-    #[On('echo-private:tasks,TaskCreated')]
-    #[On('echo-private:tasks,TaskUpdated')]
-    #[On('echo-private:tasks,TaskDeleted')]
+    // Refresh when a task is created by another user.
     #[On('refresh-task-list')]
-    public function refreshList(): void 
+    #[On('echo-private:tasks,.TaskCreated')]
+    #[On('echo-private:tasks,.TaskUpdated')]
+    #[On('echo-private:tasks,.TaskDeleted')]
+    public function refreshTaskList(): void
     {
-        // Livewire automatically Re-renders render() on any real-time update
+        // Livewire automatically re-renders after this event.
     }
 
     public function render()
     {
+        $result = ShowTaskAction::run(
+            user: auth()->user(),
+            perPage: $this->perPage,
+        );
+
         return view('components.tasks.⚡task-list', [
-            'tasks' => Task::latest()->paginate($this->perPage),
+            'tasks' => $result['tasks'],
         ]);
     }
 };
+
 ?>
 
 <div>
@@ -48,8 +54,14 @@ new class extends Component
                 <div class="w-10 h-10 mx-auto mb-3 rounded-full bg-slate-800/80 border border-white/10 flex items-center justify-center">
                     <x-carbon-task class="w-6 h-6 text-slate-500"/>
                 </div>
-                <p class="text-sm font-medium text-slate-300">No tasks found</p>
-                <p class="text-xs text-slate-500 mt-1">Add a task above to get started!</p>
+
+                <p class="text-sm font-medium text-slate-300">
+                    No tasks found
+                </p>
+
+                <p class="text-xs text-slate-500 mt-1">
+                    Add a task above to get started!
+                </p>
             </li>
         @endforelse
     </ul>
@@ -62,6 +74,7 @@ new class extends Component
             <span wire:loading.remove wire:target="loadMore">
                 Scroll down (or click here) to load more...
             </span>
+
             <span wire:loading wire:target="loadMore">
                 Loading more tasks...
             </span>

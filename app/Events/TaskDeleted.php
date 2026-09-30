@@ -19,6 +19,7 @@ class TaskDeleted implements ShouldBroadcastNow
      * Create a new event instance.
      */
     public function __construct(
+        public int $taskId,
         public array $taskData,
         public string $userEmail
     )
@@ -48,16 +49,9 @@ class TaskDeleted implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'id'                  => $this->taskData['id'],
-            'user_id'             => $this->taskData['user_id'],
-            'title'               => $this->taskData['title'],
-            'description'         => $this->taskData['description'],
-            'status'              => $this->taskData['status']?->value ?? $this->taskData['status'],
-            'priority'            => $this->taskData['priority']?->value ?? $this->taskData['priority'],
-            'collaborator_email'  => $this->taskData['collaborator_email'],
-            'due_at'              => $this->taskData['due_at'],
-
-            'user_email'          => $this->userEmail,
+            'task_id'       => $this->taskId,
+            'task_data'     => $this->taskData,
+            'user_email'    => $this->userEmail,
         ];
     }
 }

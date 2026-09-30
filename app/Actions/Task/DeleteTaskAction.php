@@ -19,6 +19,13 @@ class DeleteTaskAction
 
     public function handle(Task $task): void
     {
+        // Keep the task ID before deleting the model
+        $taskId = $task->id;
+        
+        // Capture the data BEFORE deleting the task
+        $taskData = $task->toArray();
+        $userEmail = $task->user->email;
+
         // Delete physical files from local storage if present
         if (!empty($task->filename) && is_array($task->filename)) {
             foreach ($task->filename as $file) {
@@ -29,18 +36,18 @@ class DeleteTaskAction
         }
 
         // Delete from local SQLite database
-        $taskId = $task->id;
-
-        // Capture task attributes as an array BEFORE deletion for queued mail
-        $taskData = $task->toArray();
-        $userEmail = $task->user->email;
-
         $task->delete();
 
-        // Delete document from Firestore (Triggers real-time sync for other users)
-        $this->firestore->database()->collection('tasks')->document((string) $taskId)->delete();
+        // Delete from Firestore
+        $this->firestore
+            ->database()
+            ->collection('tasks')
+            ->document((string) $taskId)
+            ->delete();
 
-        // Laravel Broadcasting
-        broadcast(new TaskDeleted($taskData, $userEmail))->toOthers();
+        // Broadcast deletion to other connected users
+        broadcast(
+            new TaskDeleted($taskId, $taskData, $userEmail)
+        )->toOthers();
     }
 }

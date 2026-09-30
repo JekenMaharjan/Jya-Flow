@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Support\Facades\Broadcast;
 
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
@@ -8,6 +7,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 });
 
 // Authorize logged-in users to listen to the private 'tasks' channel
-Broadcast::channel('tasks', function (User $user) {
-    return true;
+Broadcast::channel('tasks', function ($user) {
+    return $user !== null;
 });

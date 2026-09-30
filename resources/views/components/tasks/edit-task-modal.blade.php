@@ -75,6 +75,7 @@
                 @foreach(['low' => 'Low', 'medium' => 'Medium', 'high' => 'High'] as $value => $label)
                     <option 
                         value="{{ $value }}" 
+                        class="bg-slate-900 text-white"
                         {{ old('priority', $task->priority?->value ?? $task->priority) === $value ? 'selected' : '' }}
                     >
                         {{ $label }}
@@ -91,6 +92,7 @@
                 @foreach(['pending' => 'Pending', 'in_progress' => 'In Progress', 'completed' => 'Completed'] as $value => $label)
                     <option 
                         value="{{ $value }}" 
+                        class="bg-slate-900 text-white"
                         {{ old('status', $task->status?->value ?? $task->status) === $value ? 'selected' : '' }}
                     >
                         {{ $label }}

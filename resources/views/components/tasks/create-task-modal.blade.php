@@ -4,7 +4,7 @@
 @endphp
 
 <x-modal name="create-task-modal" title="Add Your Task Here!">
-    <p class="text-xs text-slate-400">Note: Created Tasks are automatically set to InProgress status</p>
+    <p class="text-xs text-slate-400 text-right">Note: Created Tasks are automatically set to InProgress status</p>
     <form action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-4 w-full">
         @csrf
 

@@ -35,12 +35,12 @@
 
     <!-- Filter by Status & Priority -->
     <livewire:tasks.task-filter 
-        :total-tasks-count = ""
-        :in-progress-tasks-count = ""
-        :completed-tasks-count = ""
-        :low-tasks-count = ""
-        :medium-tasks-count = ""
-        :high-tasks-count = ""
+        :total-tasks-count="$totalTasksCount"
+        :in-progress-tasks-count="$inProgressTasksCount"
+        :completed-tasks-count="$completedTasksCount"
+        :low-tasks-count="$lowTasksCount"
+        :medium-tasks-count="$mediumTasksCount"
+        :high-tasks-count="$highTasksCount"
     />
 
     <hr class="border-white/10 my-4">
@@ -59,5 +59,5 @@
     <livewire:tasks.task-list />
 </div>
 
-@include('tasks.create-task-modal')
+@include('tasks.create-task-modal', ['members' => $members])
 @endsection

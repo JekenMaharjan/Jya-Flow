@@ -76,7 +76,9 @@ new class extends Component
     public function deleteTask(): void
     {
         DeleteTaskAction::run($this->task);
+
         $this->dispatch('refresh-task-list');
+        
         session()->flash('success', 'Task deleted successfully!');
     }
 };

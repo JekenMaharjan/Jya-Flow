@@ -22,7 +22,7 @@ class CreateTaskAction
     public function handle(User $user, array $data, array $files = []): Task
     {
         // Convert Nepal time (NPT) into UTC if due_at is provided
-        if (! empty($data['due_at'])) {
+        if (!empty($data['due_at'])) {
             $data['due_at'] = Carbon::parse($data['due_at'], 'Asia/Kathmandu')->setTimezone('UTC');
         }
 
@@ -38,7 +38,7 @@ class CreateTaskAction
             $data['collaborator_email'] = implode(',', array_filter($data['collaborator_email']));
         }
 
-        // Create SQLit Eloquent Task
+        // Create SQLite Eloquent Task
         $task = $user->tasks()->create($data);
 
         // Sync to Firestore (Triggers real-time sync for other users)
