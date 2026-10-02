@@ -11,13 +11,13 @@ new class extends Component
 
     public int $perPage = 7;
 
+    public string $status = 'all';
+    public string $priority = 'all';
+
     public function loadMore(): void
     {
         $this->perPage += 7;
     }
-
-    public string $status = 'all';
-    public string $priority = 'all';
 
     #[On('filter-changed')]
     public function applyFilters(string $status, string $priority): void

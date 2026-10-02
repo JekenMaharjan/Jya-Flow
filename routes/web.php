@@ -16,6 +16,10 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/users', 'showUsers')->name('users');
 });
 
+Route::get('/counter', function () {
+    return view('alpinejs.counter');
+});
+
 // Testing firebase
 // Route::get('/firebase-test', [FirebaseController::class, 'test']);
 Route::get('/firebase-test', [FirebaseConnectionController::class, 'index']);

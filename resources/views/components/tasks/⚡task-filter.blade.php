@@ -5,10 +5,10 @@ use Livewire\Attributes\Url;
 
 new class extends Component
 {
-    #[Url]
+    #[Url(history: true)]
     public string $status = 'all';
 
-    #[Url]
+    #[Url(history: true)]
     public string $priority = 'all';
 
     // Accept initial counts passed from controller or view
