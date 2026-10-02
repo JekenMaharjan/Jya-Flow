@@ -89,7 +89,7 @@
         <div>
             <label for="status_{{ $task->id }}" class="{{ $labelClass }}">Status</label>
             <select name="status" id="status_{{ $task->id }}" required class="{{ $inputClass }} bg-slate-900">
-                @foreach(['pending' => 'Pending', 'in_progress' => 'In Progress', 'completed' => 'Completed'] as $value => $label)
+                @foreach(['in_progress' => 'In Progress', 'completed' => 'Completed'] as $value => $label)
                     <option 
                         value="{{ $value }}" 
                         class="bg-slate-900 text-white"
